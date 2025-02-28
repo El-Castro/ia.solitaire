@@ -1,1 +1,2 @@
-# ia.solitaire
+# FreeCell Solitaire
+## IA - Group T03G08
