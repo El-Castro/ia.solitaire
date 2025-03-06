@@ -32,30 +32,50 @@ class FreeCellGUI:
             self.draw_cards(i)
 
     def draw_cards(self, column_index):
+        # Draw cards in the tableau columns
         column = self.game.tableau[column_index]
         for j, card in enumerate(column):
             card_text = f"{card[1]}{card[0][0].upper()}"
             self.canvas.create_text(90 + column_index * 100, 240 + j * 20, text=card_text, fill="black")
 
     def handle_click(self, event):
+        # Handle click events on the canvas
         if event.y < 130:  # Clicked on free cells or foundations (not handled yet)
-            pass
+            freecell_index = (event.x - 50) // 100
+            if 0 <= freecell_index < 4:  # Ensure index is within bounds
+                if self.selected_card is None:
+                    if self.game.free_cells[freecell_index]:
+                        self.selected_card = self.game.free_cells[freecell_index]
+                        self.selected_column = None
+                        self.canvas.create_text(event.x, event.y, text=f"Selected: {self.selected_card[1]}{self.selected_card[0][0].upper()}", fill="red")
+                else:
+                    if self.selected_column is None:
+                        self.game = self.game.apply_move(("freecell_to_tableau", freecell_index, self.selected_card))
+                        self.selected_card = None
+                        self.selected_column = None
+                    self.update_game_state()
         elif event.y > 200:  # Clicked on tableau columns
             column_index = (event.x - 50) // 100
-            if self.selected_card is None:
-                # Select the card if a tableau column is clicked
-                if self.game.tableau[column_index]:
-                    self.selected_column = column_index
-                    self.selected_card = self.game.tableau[column_index][-1]
-                    self.canvas.create_text(event.x, event.y, text=f"Selected: {self.selected_card[1]}{self.selected_card[0][0].upper()}", fill="red")
-            else:
-                # Move the selected card to this column
-                if self.selected_column is not None and column_index != self.selected_column:
-                    self.game = self.game.apply_move(("tableau_to_tableau", self.selected_column, column_index))
-                    self.selected_card = None
-                    self.selected_column = None
-                self.update_game_state()
+            if 0 <= column_index < 8:  # Ensure index is within bounds
+                if self.selected_card is None:
+                    # Select the card if a tableau column is clicked
+                    if self.game.tableau[column_index]:
+                        self.selected_column = column_index
+                        self.selected_card = self.game.tableau[column_index][-1]
+                        self.canvas.create_text(event.x, event.y, text=f"Selected: {self.selected_card[1]}{self.selected_card[0][0].upper()}", fill="red")
+                else:
+                    # Move the selected card to this column
+                    if self.selected_column is not None and column_index != self.selected_column:
+                        self.game = self.game.apply_move(("tableau_to_tableau", self.selected_column, column_index))
+                        self.selected_card = None
+                        self.selected_column = None
+                    elif self.selected_column is None:
+                        self.game = self.game.apply_move(("freecell_to_tableau", self.selected_card, column_index))
+                        self.selected_card = None
+                        self.selected_column = None
+                    self.update_game_state()
 
     def update_game_state(self):
+        # Update the game state and redraw the board
         self.canvas.delete("all")  # Clear the canvas
         self.draw_board()
