@@ -1,5 +1,8 @@
-import copy
-import heapq
+import tkinter as tk
+from tkinter import Canvas
+import random
+import copy  # Import copy module
+import heapq  # Import heapq module
 
 class FreeCell:
     def __init__(self, tableau, free_cells=None, foundations=None):
@@ -9,7 +12,7 @@ class FreeCell:
 
     def is_solved(self):
         return all(len(self.foundations[suit]) == 13 for suit in self.foundations)
-    
+
     def get_possible_moves(self):
         moves = []
         for i, column in enumerate(self.tableau):
@@ -22,12 +25,12 @@ class FreeCell:
             if card and self.can_move_to_foundation(card):
                 moves.append(("freecell_to_foundation", i))
         return moves
-    
+
     def can_move_to_foundation(self, card):
         suit, rank = card
         foundation = self.foundations[suit]
-        return (rank == 1 and not foundation) or (foundation and foundation[-1] == rank - 1)
-    
+        return (rank == 1 and not foundation) or (foundation and foundation[-1][1] == rank - 1)
+
     def apply_move(self, move):
         new_state = copy.deepcopy(self)
         move_type, index = move
@@ -42,8 +45,13 @@ class FreeCell:
             card = new_state.free_cells[index]
             new_state.free_cells[index] = None
             new_state.foundations[card[0]].append(card)
+        elif move_type == "tableau_to_tableau":
+            from_column = index
+            to_column = move[1]
+            card = new_state.tableau[from_column].pop()
+            new_state.tableau[to_column].append(card)
         return new_state
-    
+
     def heuristic(self):
         return sum(13 - len(self.foundations[suit]) for suit in self.foundations)
 
