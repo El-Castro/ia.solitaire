@@ -1,6 +1,7 @@
+
 from tkinter import Tk
 from FreecellGui import FreeCellGUI
-from FreecellGame import FreeCell
+from FreecellState import FreeCellState
 import random
 
 def main():
@@ -17,7 +18,7 @@ def main():
         tableau[i] = [deck.pop() for _ in range(6)]
 
     # Initialize the game and GUI
-    game = FreeCell(tableau)
+    game = FreeCellState(tableau)
     root = Tk()
     gui = FreeCellGUI(root, game)
     gui.canvas.bind("<Button-1>", gui.handle_click)  # Binding click event
