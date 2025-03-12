@@ -1,5 +1,5 @@
 import FreecellMove
-import Card
+from Card import Card
 import tkinter as tk
 from tkinter import Canvas
 import random
@@ -13,7 +13,6 @@ class FreeCellState:
         self.foundations = foundations if foundations else {suit: [] for suit in ['hearts', 'diamonds', 'clubs', 'spades']}
         self.history = []
 
-
     def copy(self):
         return FreeCellState([col[:] for col in self.tableau], self.free_cells[:], self.foundations.copy())
     
@@ -24,7 +23,7 @@ class FreeCellState:
     @staticmethod
     def create_random_state():
         # Create a deck of cards
-        deck = [Card(suit, rank) for suit in ['hearts', 'diamonds', 'clubs', 'spades'] for rank in range(1, 14)]
+        deck = [Card(rank, suit) for suit in ['hearts', 'diamonds', 'clubs', 'spades'] for rank in range(1, 14)]
         random.shuffle(deck)
         
         # Distribute cards to tableau columns
@@ -43,6 +42,24 @@ class FreeCellState:
             self.tableau = previous_state.tableau
             self.free_cells = previous_state.free_cells
             self.foundations = previous_state.foundations
+
+    def apply_move(self, move):
+        move_type = move[0]
+        if move_type == "tableau_to_foundation":
+            return FreecellMove.move_tableau_to_foundation(self, move[1])
+        elif move_type == "tableau_to_freecell":
+            return FreecellMove.move_tableau_to_freecell(self, move[1])
+        elif move_type == "freecell_to_foundation":
+            return FreecellMove.move_freecell_to_foundation(self, move[1])
+        elif move_type == "tableau_to_tableau":
+            return FreecellMove.move_tableau_to_tableau(self, move[1], move[2])
+        elif move_type == "freecell_to_tableau":
+            return FreecellMove.move_freecell_to_tableau(self, move[1], move[2])
+        elif move_type == "foundation_to_tableau":
+            return FreecellMove.move_foundation_to_tableau(self, move[1], move[2])
+        elif move_type == "foundation_to_freecell":
+            return FreecellMove.move_foundation_to_freecell(self, move[1], move[2])
+        return self
 
 
 

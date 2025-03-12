@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import Canvas
+import FreecellMove
 
 class FreeCellGUI:
     def __init__(self, root, game):
@@ -32,10 +33,9 @@ class FreeCellGUI:
             self.draw_cards(i)
 
     def draw_cards(self, column_index):
-        # Draw cards in the tableau columns
         column = self.game.tableau[column_index]
         for j, card in enumerate(column):
-            card_text = f"{card[1]}{card[0][0].upper()}"
+            card_text = f"{card.rank}{card.suit[0].upper()}"
             self.canvas.create_text(90 + column_index * 100, 240 + j * 20, text=card_text, fill="black")
 
     def handle_click(self, event):
@@ -50,7 +50,7 @@ class FreeCellGUI:
                         self.canvas.create_text(event.x, event.y, text=f"Selected: {self.selected_card[1]}{self.selected_card[0][0].upper()}", fill="red")
                 else:
                     if self.selected_column is None:
-                        self.game = self.game.apply_move(("freecell_to_tableau", freecell_index, self.selected_card))
+                        self.game = FreecellMove.move_freecell_to_tableau(self.game, freecell_index, self.selected_card)
                         self.selected_card = None
                         self.selected_column = None
                     self.update_game_state()
@@ -66,11 +66,11 @@ class FreeCellGUI:
                 else:
                     # Move the selected card to this column
                     if self.selected_column is not None and column_index != self.selected_column:
-                        self.game = self.game.apply_move(("tableau_to_tableau", self.selected_column, column_index))
+                        self.game = FreecellMove.move_tableau_to_tableau(self.game, self.selected_column, column_index)
                         self.selected_card = None
                         self.selected_column = None
                     elif self.selected_column is None:
-                        self.game = self.game.apply_move(("freecell_to_tableau", self.selected_card, column_index))
+                        self.game = FreecellMove.move_freecell_to_tableau(self.game, self.selected_card, column_index)
                         self.selected_card = None
                         self.selected_column = None
                     self.update_game_state()
