@@ -5,12 +5,12 @@ class Card:
         self.colour = self.get_colour()
 
     def get_colour(self):
-        if self.suit in ['Hearts', 'Diamonds']:
-            return 'Red'
-        elif self.suit in ['Clubs', 'Spades']:
-            return 'Black'
+        if self.suit in ['hearts', 'diamonds']:
+            return 'red'
+        elif self.suit in ['clubs', 'spades']:
+            return 'black'
         else:
-            return 'Unknown'
+            return 'unknown'
 
     def __repr__(self):
         return f"{self.rank} of {self.suit} ({self.colour})"

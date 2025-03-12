@@ -1,7 +1,6 @@
-import FreecellMove
 from Card import Card
-import tkinter as tk
-from tkinter import Canvas
+from Move import Move
+import FreecellMove
 import random
 import copy
 import heapq
@@ -10,7 +9,7 @@ class FreeCellState:
     def __init__(self, tableau, free_cells=None, foundations=None):
         self.tableau = tableau  # 8 tableau columns
         self.free_cells = free_cells if free_cells else [None] * 4  # 4 free cells
-        self.foundations = foundations if foundations else {suit: [] for suit in ['hearts', 'diamonds', 'clubs', 'spades']}
+        self.foundations = foundations if foundations else {suit: 0 for suit in ['hearts', 'diamonds', 'clubs', 'spades']}
         self.history = []
 
     def copy(self):
@@ -44,21 +43,22 @@ class FreeCellState:
             self.foundations = previous_state.foundations
 
     def apply_move(self, move):
-        move_type = move[0]
+        print("Apply move")
+        move_type = move.move_type
         if move_type == "tableau_to_foundation":
-            return FreecellMove.move_tableau_to_foundation(self, move[1])
+            return FreecellMove.move_tableau_to_foundation(self, move.source)
         elif move_type == "tableau_to_freecell":
-            return FreecellMove.move_tableau_to_freecell(self, move[1])
+            return FreecellMove.move_tableau_to_freecell(self, move.source)
         elif move_type == "freecell_to_foundation":
-            return FreecellMove.move_freecell_to_foundation(self, move[1])
+            return FreecellMove.move_freecell_to_foundation(self, move.source)
         elif move_type == "tableau_to_tableau":
-            return FreecellMove.move_tableau_to_tableau(self, move[1], move[2])
+            return FreecellMove.move_tableau_to_tableau(self, move.source, move.destination)
         elif move_type == "freecell_to_tableau":
-            return FreecellMove.move_freecell_to_tableau(self, move[1], move[2])
+            return FreecellMove.move_freecell_to_tableau(self, move.source, move.destination)
         elif move_type == "foundation_to_tableau":
-            return FreecellMove.move_foundation_to_tableau(self, move[1], move[2])
+            return FreecellMove.move_foundation_to_tableau(self, move.source, move.destination)
         elif move_type == "foundation_to_freecell":
-            return FreecellMove.move_foundation_to_freecell(self, move[1], move[2])
+            return FreecellMove.move_foundation_to_freecell(self, move.source, move.destination)
         return self
 
 

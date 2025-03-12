@@ -9,7 +9,6 @@ def main():
     # Initialize the game and GUI
     root = Tk()
     gui = FreeCellGUI(root, game)
-    gui.canvas.bind("<Button-1>", gui.handle_click)  # Binding click event
     root.mainloop()
 
 if __name__ == "__main__":
