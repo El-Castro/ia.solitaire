@@ -14,3 +14,15 @@ class Card:
 
     def __repr__(self):
         return f"{self.rank} of {self.suit} ({self.colour})"
+    
+    def to_dict(self):
+        return {
+            'rank': self.rank,
+            'suit': self.suit,
+            'colour': self.colour
+        }
+
+    @staticmethod
+    def from_dict(card_dict):
+        return Card(card_dict['rank'], card_dict['suit'])
+    

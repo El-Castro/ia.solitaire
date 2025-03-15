@@ -1,20 +1,28 @@
 import tkinter as tk
-from tkinter import Canvas
+from tkinter import Canvas, Button
 from FreecellState import FreeCellState
 import FreecellMove
 from Card import Card
 from Move import Move
+from FreecellAI import solve_game
 
 class FreeCellGUI:
     def __init__(self, root, game):
         self.root = root
         self.game = game
-        self.canvas = tk.Canvas(root, width=800, height=600, bg="green")
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.canvas = tk.Canvas(self.root, width=800, height=600, bg="green")
         self.canvas.pack()
         self.selected_card = None  # Store selected card (tuple: (area, index))
         
         self.draw_board()
         
+        # Add a button to solve the game using AI
+        solve_button = Button(self.root, text="Solve Game", command=self.solve_game)
+        solve_button.pack()
+
     def draw_board(self):
         self.canvas.delete("all")
 
@@ -86,3 +94,9 @@ class FreeCellGUI:
             # Reset selection and redraw
             self.selected_card = None
             self.draw_board()
+
+    def solve_game(self):
+        if solve_game(self.game):
+            print("Game solved by AI!")
+        else:
+            print("AI could not solve the game.")
