@@ -13,9 +13,9 @@ class FreeCellGUI:
         self.setup_ui()
 
     def setup_ui(self):
-        self.canvas = tk.Canvas(self.root, width=800, height=600, bg="green")
+        self.canvas = tk.Canvas(self.root, width=850, height=600, bg="green")
         self.canvas.pack()
-        self.selected_card = None  # Store selected card (tuple: (area, index))
+        self.selected = None
         
         self.draw_board()
         
@@ -26,73 +26,82 @@ class FreeCellGUI:
     def draw_board(self):
         self.canvas.delete("all")
 
-        # Draw Free Cells (top-left)
+        # Draw Free Cells
         for i in range(4):
             x, y = 50 + i * 100, 50
-            self.canvas.create_rectangle(x, y, x+80, y+100, outline="white", width=2)
+            rect_id = self.canvas.create_rectangle(x, y, x+60, y+90, outline="white", width=2)
+            
             if self.game.free_cells[i]:
-                self.draw_card(self.game.free_cells[i], x+10, y+10, area="freecell", index=i)
+                self.draw_card(self.game.free_cells[i], x, y, type="freecell", index=i)
+            else:
+                # Bind click event to empty FreeCell
+                self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="freecell", index=None: self.handle_click(type, index))
 
-        # Draw Foundations (top-right)
+        # Draw Foundations
         for i, suit in enumerate(["hearts", "diamonds", "clubs", "spades"]):
-            x, y = 500 + i * 100, 50
-            self.canvas.create_rectangle(x, y, x+80, y+100, outline="white", width=2)
+            x, y = 450 + i * 100, 50
+            rect_id = self.canvas.create_rectangle(x, y, x+60, y+90, outline="white", width=2)
+            
             if self.game.foundations[suit]:
-                self.draw_card(self.game.foundations[suit][-1], x+10, y+10, area="foundation", index=suit)
+                self.draw_card(self.game.foundations[suit][-1], x, y, type="foundation", index=(None,None))
+            else:
+                # Bind click event to empty Foundation
+                self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="foundation", index=None: self.handle_click(type, index))
 
-        # Draw Tableau (bottom)
-        for i, col in enumerate(self.game.tableau):
+        # Draw Tableau
+        for i, col in enumerate(self.game.tableau): # i-> num column
             x, y = 50 + i * 100, 200
-            for j, card in enumerate(col):
-                self.draw_card(card, x, y + j * 30, area="tableau", index=(i, j))
+            rect_id = self.canvas.create_rectangle(x, y, x+60, y+300, outline="white", width=2)
+            
+            for j, card in enumerate(col): # j-> num card
+                self.draw_card(card, x, y + j * 30, type="tableau", index=i)
 
-    def draw_card(self, card, x, y, area, index):
+            if not col:
+                # Bind click event to empty Tableau column
+                self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="tableau", index=i: self.handle_click(type, index))
+
+
+    def draw_card(self, card, x, y, type, index):
         """Draws a single card"""
         card_id = self.canvas.create_rectangle(x, y, x+60, y+90, fill="white", outline="black")
-        text_id = self.canvas.create_text(x+30, y+45, text=f"{card.rank} {card.suit[0]}", font=("Arial", 12))
+        text_id = self.canvas.create_text(x+40, y+15, text=f"{card.rank} {card.suit[0]}", font=("Arial", 12))
         
         # Bind click event
-        self.canvas.tag_bind(card_id, "<Button-1>", lambda event: self.handle_click(area, index))
-        self.canvas.tag_bind(text_id, "<Button-1>", lambda event: self.handle_click(area, index))
+        self.canvas.tag_bind(card_id, "<Button-1>", lambda event: self.handle_click(type, index))
+        self.canvas.tag_bind(text_id, "<Button-1>", lambda event: self.handle_click(type, index))
 
-    def handle_click(self, area, index):
+
+    def handle_click(self, type, index):
         """Handles card selection and moves"""
-        if self.selected_card is None:
-            self.selected_card = (area, index)
+        if (self.selected is None) and type != "freecell" and type != "foundation":
+                self.selected = (type, index)
         else:
-            src_area, src_index = self.selected_card
-            dest_area, dest_index = area, index
-            
-            # Create Move object
-            card = None
-            if src_area == "tableau":
-                card = self.game.tableau[src_index[0]][-1]
-            elif src_area == "freecell":
-                card = self.game.free_cells[src_index]
-            
-            move_type = None
-            if src_area == "tableau" and dest_area == "tableau":
-                move_type = "tableau_to_tableau"
-            elif src_area == "tableau" and dest_area == "freecell":
-                move_type = "tableau_to_freecell"
-            elif src_area == "freecell" and dest_area == "tableau":
-                move_type = "freecell_to_tableau"
-            elif src_area == "tableau" and dest_area == "foundation":
-                move_type = "tableau_to_foundation"
-            elif src_area == "freecell" and dest_area == "foundation":
-                move_type = "freecell_to_foundation"
 
-            move = Move(move_type, src_index[0], dest_index[0], card)
+            src_type, src_index = self.selected
+            dest_type, dest_index = type, index
+            
+            # Create Move object            
+            move_type = None
+            if src_type == "tableau" and dest_type == "tableau":
+                move_type = "tableau_to_tableau"
+            elif src_type == "tableau" and dest_type == "freecell":
+                move_type = "tableau_to_freecell"
+            elif src_type == "freecell" and dest_type == "tableau":
+                move_type = "freecell_to_tableau"
+            elif src_type == "tableau" and dest_type == "foundation":
+                move_type = "tableau_to_foundation"
+            elif src_type == "freecell" and dest_type == "foundation":
+                move_type = "freecell_to_foundation"
+            move = Move(move_type, src_index, dest_index)
 
             print(f"Selected move: {move}")
             possible_moves = FreecellMove.get_possible_moves(self.game)
             if move in possible_moves:
                 self.game = self.game.apply_move(move)
-            else:
-                print("Move not possible")
+            else: print("Move not possible")
             
             # Reset selection and redraw
-            self.selected_card = None
+            self.selected = None
             self.draw_board()
 
     def solve_game(self):

@@ -6,41 +6,40 @@ def get_possible_moves(state):
     moves = []
     for i, column in enumerate(state.tableau):
         if column and can_move_to_foundation(state, column[-1]):
-            moves.append(Move("tableau_to_foundation", i, None, column[-1]))
+            moves.append(Move("tableau_to_foundation", i, None))
 
     for i, column in enumerate(state.tableau):
-        if column and can_move_freecell(state):
-            moves.append(Move("tableau_to_freecell", i, None, column[-1]))
+        if column and can_move_to_freecell(state):
+            moves.append(Move("tableau_to_freecell", i, None))
             
     for i, card in enumerate(state.free_cells):
         if card and can_move_to_foundation(state, card):
-            moves.append(Move("freecell_to_foundation", i, None, card))
+            moves.append(Move("freecell_to_foundation", i, None))
             
     for i, column in enumerate(state.tableau):
         if column:
             for j, target_column in enumerate(state.tableau):
                 if i != j and can_move_to_tableau(state, column[-1], j):
-                    moves.append(Move("tableau_to_tableau", i, j, column[-1]))
+                    moves.append(Move("tableau_to_tableau", i, j))
 
     for i, card in enumerate(state.free_cells):
         if card:
             for j, column in enumerate(state.tableau):
                 if can_move_to_tableau(state, card, j):
-                    moves.append(Move("freecell_to_tableau", i, j, card))
+                    moves.append(Move("freecell_to_tableau", i, j))
 
     for suit in state.foundations:
         if state.foundations[suit] > 0:
             for j, column in enumerate(state.tableau):
                 card = Card(state.foundations[suit], suit)
                 if can_move_to_tableau(state, card, j):
-                    moves.append(Move("foundation_to_tableau", suit, j, card))
+                    moves.append(Move("foundation_to_tableau", suit, j))
 
     for suit in state.foundations:
-        if state.foundations[suit] > 0 and can_move_freecell(state):
+        if state.foundations[suit] > 0 and can_move_to_freecell(state):
             for i in range(len(state.free_cells)):
                 if state.free_cells[i] is None:
-                    card = Card(suit, state.foundations[suit])
-                    moves.append(Move("foundation_to_freecell", suit, i, card))
+                    moves.append(Move("foundation_to_freecell", suit, i))
 
     print("Valid moves----------------------------")
     for i in moves:
@@ -64,7 +63,7 @@ def can_move_to_tableau(state, card, column):
     top_card = state.tableau[column][-1]
     return (card.rank == top_card.rank - 1) and (card.get_colour() != top_card.get_colour())
 
-def can_move_freecell(state):
+def can_move_to_freecell(state):
     # Check if there is an empty free cell to move the card to
     return None in state.free_cells
 
@@ -86,9 +85,9 @@ def move_tableau_to_foundation(state, col):
 def move_tableau_to_freecell(state, col):
     if state.tableau[col]:  # Ensure column is not empty
         for i in range(len(state.free_cells)):
-            if state.free_cells[i] is None:
+            if state.free_cells[i] is None:  # Find an empty FreeCell
                 new_state = state.copy()
-                new_state.free_cells[i] = state.tableau[col].pop()
+                new_state.free_cells[i] = new_state.tableau[col].pop()  # Modify the copied state
                 return new_state
     return None
 
