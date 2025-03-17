@@ -93,6 +93,17 @@ class FreeCellState:
         elif move_type == "foundation_to_freecell":
             return fcm.move_foundation_to_freecell(self, move.source, move.destination)
         return self
+    
+    def auto_drag_foundation(self):
+        def recursive_drag(self):
+            possible_moves = self.get_possible_moves()
+            for move in possible_moves:
+                if move.move_type in ["tableau_to_foundation", "freecell_to_foundation"]:
+                    self.apply_move(move)
+                    return recursive_drag(self)
+            return self
+
+        return recursive_drag(self.copy())
 
     def get_possible_moves(self):
         return fcm.get_possible_moves(self)

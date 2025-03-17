@@ -29,24 +29,24 @@ class FreeCellGUI:
         # Draw Free Cells
         for i in range(4):
             x, y = 50 + i * 100, 50
-            rect_id = self.canvas.create_rectangle(x, y, x+60, y+90, outline="white", width=2)
+            rect_id = self.canvas.create_rectangle(x, y, x+60, y+90, outline="white", width=2, fill="green")
             
             if self.game.free_cells[i]:
-                self.draw_card(self.game.free_cells[i], x, y, type="freecell", index=i)
+                self.draw_card(self.game.free_cells[i], x, y, type="freecell", index=i, isCard=True)
             else:
                 # Bind click event to empty FreeCell
-                self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="freecell", index=None: self.handle_click(type, index))
+                self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="freecell", index=i, isCard=False: self.handle_click(type, index, isCard))
 
         # Draw Foundations
         for i, suit in enumerate(["hearts", "diamonds", "clubs", "spades"]):
             x, y = 450 + i * 100, 50
-            rect_id = self.canvas.create_rectangle(x, y, x+60, y+90, outline="white", width=2)
+            rect_id = self.canvas.create_rectangle(x, y, x+60, y+90, outline="white", width=2, fill="green")
             
             if self.game.foundations[suit]:
-                self.draw_card(self.game.foundations[suit][-1], x, y, type="foundation", index=(None,None))
+                self.draw_card(Card(self.game.foundations[suit],suit), x, y, type="foundation", index=suit, isCard=True)
             else:
                 # Bind click event to empty Foundation
-                self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="foundation", index=None: self.handle_click(type, index))
+                self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="foundation", index=suit, isCard=False: self.handle_click(type, index, isCard))
 
         # Draw Tableau
         for i, col in enumerate(self.game.tableau): # i-> num column
@@ -54,26 +54,28 @@ class FreeCellGUI:
             rect_id = self.canvas.create_rectangle(x, y, x+60, y+300, outline="white", width=2)
             
             for j, card in enumerate(col): # j-> num card
-                self.draw_card(card, x, y + j * 30, type="tableau", index=i)
+                self.draw_card(card, x, y + j * 30, type="tableau", index=i, isCard=True)
 
             if not col:
                 # Bind click event to empty Tableau column
-                self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="tableau", index=i: self.handle_click(type, index))
+                self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="tableau", index=i, isCard=False: self.handle_click(type, index, isCard))
 
 
-    def draw_card(self, card, x, y, type, index):
+    def draw_card(self, card, x, y, type, index, isCard):
         """Draws a single card"""
         card_id = self.canvas.create_rectangle(x, y, x+60, y+90, fill="white", outline="black")
         text_id = self.canvas.create_text(x+40, y+15, text=f"{card.rank} {card.suit[0]}", font=("Arial", 12))
         
         # Bind click event
-        self.canvas.tag_bind(card_id, "<Button-1>", lambda event: self.handle_click(type, index))
-        self.canvas.tag_bind(text_id, "<Button-1>", lambda event: self.handle_click(type, index))
+        self.canvas.tag_bind(card_id, "<Button-1>", lambda event: self.handle_click(type, index, isCard))
+        self.canvas.tag_bind(text_id, "<Button-1>", lambda event: self.handle_click(type, index, isCard))
 
 
-    def handle_click(self, type, index):
+    def handle_click(self, type, index, isCard):
+        print(type)
+        print(index)
         """Handles card selection and moves"""
-        if (self.selected is None) and type != "freecell" and type != "foundation":
+        if self.selected is None and isCard:
                 self.selected = (type, index)
         else:
 
@@ -92,6 +94,10 @@ class FreeCellGUI:
                 move_type = "tableau_to_foundation"
             elif src_type == "freecell" and dest_type == "foundation":
                 move_type = "freecell_to_foundation"
+            elif src_type == "foundation" and dest_type == "freecell":
+                move_type = "foundation_to_freecell"
+            elif src_type == "foundation" and dest_type == "tableau":
+                move_type = "foundation_to_tableau"
             move = Move(move_type, src_index, dest_index)
 
             print(f"Selected move: {move}")

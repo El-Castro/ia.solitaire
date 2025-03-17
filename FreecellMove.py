@@ -5,8 +5,9 @@ def get_possible_moves(state):
     # Get all possible moves from the current state
     moves = []
     for i, column in enumerate(state.tableau):
-        if column and can_move_to_foundation(state, column[-1]):
-            moves.append(Move("tableau_to_foundation", i, None))
+        card=column[-1]
+        if column and can_move_to_foundation(state, card):
+            moves.append(Move("tableau_to_foundation", i, card.suit))
 
     for i, column in enumerate(state.tableau):
         if column and can_move_to_freecell(state):
@@ -14,7 +15,7 @@ def get_possible_moves(state):
             
     for i, card in enumerate(state.free_cells):
         if card and can_move_to_foundation(state, card):
-            moves.append(Move("freecell_to_foundation", i, None))
+            moves.append(Move("freecell_to_foundation", i, card.suit))
             
     for i, column in enumerate(state.tableau):
         if column:
@@ -74,7 +75,7 @@ def can_move_to_freecell(state):
 def move_tableau_to_foundation(state, col):
     if state.tableau[col]:  # Ensure column is not empty
         card = state.tableau[col][-1]
-        if can_move_to_foundation(card):
+        if can_move_to_foundation(state,card):
             new_state = state.copy()
             new_state.tableau[col].pop()
             new_state.foundations[card.suit] = card.rank
@@ -95,7 +96,7 @@ def move_tableau_to_freecell(state, col):
 def move_freecell_to_foundation(state, fc):
     if state.free_cells[fc] is not None:
         card = state.free_cells[fc]
-        if can_move_to_foundation(card):
+        if can_move_to_foundation(state,card):
             new_state = state.copy()
             new_state.free_cells[fc] = None
             new_state.foundations[card.suit] = card.rank
@@ -138,7 +139,7 @@ def move_foundation_to_tableau(state, suit, col):
 def move_foundation_to_freecell(state, suit, fc):
     if suit in state.foundations and state.foundations[suit] > 0 and state.free_cells[fc] is None:
         new_state = state.copy()
-        new_state.free_cells[fc] = Card(suit, state.foundations[suit])
+        new_state.free_cells[fc] = Card(state.foundations[suit], suit)
         new_state.foundations[suit] -= 1
         return new_state
     return None
