@@ -51,7 +51,7 @@ class FreeCellGUI:
         # Draw Tableau
         for i, col in enumerate(self.game.tableau): # i-> num column
             x, y = 50 + i * 100, 200
-            rect_id = self.canvas.create_rectangle(x, y, x+60, y+300, outline="white", width=2)
+            rect_id = self.canvas.create_rectangle(x, y, x+60, y+300, outline="white", width=2, fill="green")
             
             for j, card in enumerate(col): # j-> num card
                 self.draw_card(card, x, y + j * 30, type="tableau", index=i, isCard=True)
@@ -74,7 +74,6 @@ class FreeCellGUI:
     def handle_click(self, type, index, isCard):
         print(type)
         print(index)
-        print(self.selected)
         """Handles card selection and moves"""
         if self.selected!=None and self.selected[0]=="freecell" and type=="freecell":
             print("Freecell to Freecell move is irrelevant.")
