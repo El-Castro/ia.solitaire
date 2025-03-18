@@ -35,7 +35,7 @@ class FreeCellGUI:
                 self.draw_card(self.game.free_cells[i], x, y, type="freecell", index=i, isCard=True)
             else:
                 # Bind click event to empty FreeCell
-                self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="freecell", index=i, isCard=False: self.handle_click(type, index, isCard))
+                self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="freecell", index=None, isCard=False: self.handle_click(type, index, isCard))
 
         # Draw Foundations
         for i, suit in enumerate(["hearts", "diamonds", "clubs", "spades"]):
@@ -74,8 +74,11 @@ class FreeCellGUI:
     def handle_click(self, type, index, isCard):
         print(type)
         print(index)
+        print(self.selected)
         """Handles card selection and moves"""
-        if self.selected is None and isCard:
+        if self.selected!=None and self.selected[0]=="freecell" and type=="freecell":
+            print("Freecell to Freecell move is irrelevant.")
+        elif self.selected is None and isCard:
                 self.selected = (type, index)
         else:
 
@@ -97,7 +100,7 @@ class FreeCellGUI:
             elif src_type == "foundation" and dest_type == "freecell":
                 move_type = "foundation_to_freecell"
             elif src_type == "foundation" and dest_type == "tableau":
-                move_type = "foundation_to_tableau"
+                move_type = "foundation_to_tableau"        
             move = Move(move_type, src_index, dest_index)
 
             print(f"Selected move: {move}")

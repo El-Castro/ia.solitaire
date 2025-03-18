@@ -5,9 +5,10 @@ def get_possible_moves(state):
     # Get all possible moves from the current state
     moves = []
     for i, column in enumerate(state.tableau):
-        card=column[-1]
-        if column and can_move_to_foundation(state, card):
-            moves.append(Move("tableau_to_foundation", i, card.suit))
+        if column:
+            card=column[-1]
+            if column and can_move_to_foundation(state, card):
+                moves.append(Move("tableau_to_foundation", i, card.suit))
 
     for i, column in enumerate(state.tableau):
         if column and can_move_to_freecell(state):
@@ -40,7 +41,7 @@ def get_possible_moves(state):
         if state.foundations[suit] > 0 and can_move_to_freecell(state):
             for i in range(len(state.free_cells)):
                 if state.free_cells[i] is None:
-                    moves.append(Move("foundation_to_freecell", suit, i))
+                    moves.append(Move("foundation_to_freecell", suit, None))
 
     print("Valid moves----------------------------")
     for i in moves:
@@ -137,9 +138,22 @@ def move_foundation_to_tableau(state, suit, col):
 
 # Move from foundation to freecell (rare case)
 def move_foundation_to_freecell(state, suit, fc):
-    if suit in state.foundations and state.foundations[suit] > 0 and state.free_cells[fc] is None:
-        new_state = state.copy()
-        new_state.free_cells[fc] = Card(state.foundations[suit], suit)
-        new_state.foundations[suit] -= 1
-        return new_state
+    if suit in state.foundations and state.foundations[suit] > 0:
+        for i in range(len(state.free_cells)):
+            if state.free_cells[i] is None:
+                new_state = state.copy()
+                new_state.free_cells[i] = Card(state.foundations[suit], suit)
+                new_state.foundations[suit] -= 1
+                return new_state
     return None
+
+
+# # Move from tableau to freecell
+# def move_tableau_to_freecell(state, col):
+#     if state.tableau[col]:  # Ensure column is not empty
+#         for i in range(len(state.free_cells)):
+#             if state.free_cells[i] is None:  # Find an empty FreeCell
+#                 new_state = state.copy()
+#                 new_state.free_cells[i] = new_state.tableau[col].pop()  # Modify the copied state
+#                 return new_state
+#     return None
