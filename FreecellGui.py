@@ -18,12 +18,20 @@ class FreeCellGUI:
 
 
     def setup_ui(self):
-        self.canvas = tk.Canvas(self.root, width=850, height=600, bg="green")
+        self.canvas = tk.Canvas(self.root, width=850, height=600)
         self.canvas.pack()
+
+        # Load the background image
+        self.bg_image = Image.open("assets/table.png")  
+        self.bg_image = self.bg_image.resize((850, 600), Image.LANCZOS)
+        self.bg_photo = ImageTk.PhotoImage(self.bg_image)
+
+        # Place the image on the canvas
+        self.canvas.create_image(0, 0, image=self.bg_photo, anchor="nw") 
+
         self.selected = None
-        
-        self.draw_board()
-        
+        self.draw_board()  
+
         # Add a button to solve the game using AI
         solve_button = Button(self.root, text="Solve Game", command=self.solve_game)
         solve_button.pack()
@@ -42,6 +50,9 @@ class FreeCellGUI:
     def draw_board(self):
         self.canvas.delete("all")
 
+        # Re-add background image after clearing the canvas
+        self.canvas.create_image(0, 0, image=self.bg_photo, anchor="nw")
+
         # Draw Free Cells
         for i in range(4):
             x, y = 50 + i * 100, 50
@@ -50,13 +61,13 @@ class FreeCellGUI:
             if self.game.free_cells[i]:
                 self.draw_card(self.game.free_cells[i], x, y, type="freecell", index=i, isCard=True)
             else:
-                # Bind click event to empty FreeCell
                 self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="freecell", index=None, isCard=False: self.handle_click(type, index, isCard))
 
         # Draw Foundations
         for i, suit in enumerate(["hearts", "diamonds", "clubs", "spades"]):
             x, y = 450 + i * 100, 50
             rect_id = self.canvas.create_rectangle(x, y, x+60, y+90, outline="white", width=2, fill="green")
+            
             match suit:
                 case "hearts":
                     text_id = self.canvas.create_text(x+30, y+40, text=f"♥", font=("Arial", 35), fill="white")
@@ -68,23 +79,22 @@ class FreeCellGUI:
                     text_id = self.canvas.create_text(x+30, y+40, text=f"♠", font=("Arial", 35), fill="white")
 
             if self.game.foundations[suit]:
-                self.draw_card(Card(self.game.foundations[suit],suit), x, y, type="foundation", index=suit, isCard=True)
+                self.draw_card(Card(self.game.foundations[suit], suit), x, y, type="foundation", index=suit, isCard=True)
             else:
-                # Bind click event to empty Foundation
                 self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="foundation", index=suit, isCard=False: self.handle_click(type, index, isCard))
                 self.canvas.tag_bind(text_id, "<Button-1>", lambda event, type="foundation", index=suit, isCard=False: self.handle_click(type, index, isCard))
 
         # Draw Tableau
-        for i, col in enumerate(self.game.tableau): # i-> num column
+        for i, col in enumerate(self.game.tableau):  
             x, y = 50 + i * 100, 200
             rect_id = self.canvas.create_rectangle(x, y, x+60, y+300, outline="white", width=2, fill="green")
-            
-            for j, card in enumerate(col): # j-> num card
+
+            for j, card in enumerate(col):  
                 self.draw_card(card, x, y + j * 30, type="tableau", index=i, isCard=True)
 
             if not col:
-                # Bind click event to empty Tableau column
                 self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="tableau", index=i, isCard=False: self.handle_click(type, index, isCard))
+
 
 
     def draw_card(self, card, x, y, type, index, isCard):
