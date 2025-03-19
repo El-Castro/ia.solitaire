@@ -8,11 +8,14 @@ from Move import Move
 from FreecellAI import solve_game
 
 class FreeCellGUI:
+
     def __init__(self, root, game):
         self.root = root
         self.game = game
         self.card_images = {}
+        self.highlight_id = None
         self.setup_ui()
+
 
     def setup_ui(self):
         self.canvas = tk.Canvas(self.root, width=850, height=600, bg="green")
@@ -24,6 +27,7 @@ class FreeCellGUI:
         # Add a button to solve the game using AI
         solve_button = Button(self.root, text="Solve Game", command=self.solve_game)
         solve_button.pack()
+
 
     def load_card_image(self, card):
         """Loads and resizes the card image"""
@@ -68,6 +72,7 @@ class FreeCellGUI:
             else:
                 # Bind click event to empty Foundation
                 self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="foundation", index=suit, isCard=False: self.handle_click(type, index, isCard))
+                self.canvas.tag_bind(text_id, "<Button-1>", lambda event, type="foundation", index=suit, isCard=False: self.handle_click(type, index, isCard))
 
         # Draw Tableau
         for i, col in enumerate(self.game.tableau): # i-> num column
@@ -83,8 +88,6 @@ class FreeCellGUI:
 
 
     def draw_card(self, card, x, y, type, index, isCard):
-
-
         image = self.load_card_image(card)
         img_id = self.canvas.create_image(x + 30, y + 45, image=image, anchor="center")  # Center the image
 
@@ -95,13 +98,17 @@ class FreeCellGUI:
     def handle_click(self, type, index, isCard):
         print(type)
         print(index)
-        """Handles card selection and moves"""
-        if self.selected!=None and self.selected[0]=="freecell" and type=="freecell":
+
+        if self.selected != None and self.selected[0] == "freecell" and type == "freecell":
             print("Freecell to Freecell move is irrelevant.")
         elif self.selected is None and isCard:
-                self.selected = (type, index)
-        else:
+            self.selected = (type, index)
 
+            # Highlight the selected card
+            card_x, card_y = self.get_card_position(type, index)
+            self.highlight_card(card_x, card_y)
+
+        else:
             src_type, src_index = self.selected
             dest_type, dest_index = type, index
             
@@ -127,14 +134,46 @@ class FreeCellGUI:
             possible_moves = FreecellMove.get_possible_moves(self.game)
             if move in possible_moves:
                 self.game = self.game.apply_move(move)
-            else: print("Move not possible")
-            
+            else: 
+                print("Move not possible")
+
             # Reset selection and redraw
             self.selected = None
+            self.remove_highlight()
             self.draw_board()
+
 
     def solve_game(self):
         if solve_game(self.game):
             print("Game solved by AI!")
         else:
             print("AI could not solve the game.")
+
+
+    def highlight_card(self, x, y):
+        """Draws a highlight rectangle around the selected card"""
+        self.remove_highlight()  # Remove previous highlight if exists
+        self.highlight_id = self.canvas.create_rectangle(
+            x, y, x+60, y+90, outline="yellow", width=4
+        )
+
+
+    def remove_highlight(self):
+        """Removes the highlight rectangle"""
+        if self.highlight_id:
+            self.canvas.delete(self.highlight_id)
+            self.highlight_id = None
+
+
+    def get_card_position(self, type, index):
+        """Returns the x, y position of a card based on its type and index"""
+        if type == "freecell":
+            return (50 + index * 100, 50)
+        elif type == "foundation":
+            foundation_map = {"hearts": 0, "diamonds": 1, "clubs": 2, "spades": 3}
+            return (450 + foundation_map[index] * 100, 50)
+        elif type == "tableau":
+            column = self.game.tableau[index]
+            return (50 + index * 100, 200 + (len(column) - 1) * 30)
+        return (0, 0)  # Default value if type is unknown
+
