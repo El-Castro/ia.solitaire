@@ -1,14 +1,17 @@
 from tkinter import Tk
-from FreecellGui import FreeCellGUI
-from FreecellState import FreeCellState
+#from FreeCellGui import FreeCellGUI
+#from FreeCellState import FreeCellState
+from FreeCellMenu import FreecellMenu
 
 def main():
+    #Show the menu 
+
     # Initialize the game state with random tableau
-    game = FreeCellState.create_random_state()
+    #game = FreeCellState.create_random_state()
 
     # Initialize the game and GUI
     root = Tk()
-    gui = FreeCellGUI(root, game)
+    menu = FreecellMenu(root)
     root.mainloop()
 
 if __name__ == "__main__":
