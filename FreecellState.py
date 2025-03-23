@@ -54,10 +54,14 @@ class FreecellState:
 
     @staticmethod
     def load_presets(filename):
-        with open(filename, 'r') as f:
+        with open(os.path.join('saves', filename), 'r') as f:
             presets = json.load(f)
         return presets
-
+    
+    @staticmethod
+    def get_presets_name(presets):
+        return [preset["name"] for preset in presets]
+    
     @staticmethod
     def create_from_preset(preset):
         tableau = [[Card.from_dict(card) for card in col] for col in preset['tableau']]
