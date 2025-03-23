@@ -1,13 +1,13 @@
 from Card import Card
 from Move import Move
-import FreecellMove as fcm
+import FreeCellMove as fcm
 import random
 import copy
 import heapq
 import os
 import json
 
-class FreeCellState:
+class FreecellState:
     def __init__(self, tableau, free_cells=None, foundations=None):
         self.tableau = tableau  # 8 tableau columns
         self.free_cells = free_cells if free_cells else [None] * 4  # 4 free cells
@@ -15,7 +15,7 @@ class FreeCellState:
         self.history = []
 
     def copy(self):
-        return FreeCellState([col[:] for col in self.tableau], self.free_cells[:], self.foundations.copy())
+        return FreecellState([col[:] for col in self.tableau], self.free_cells[:], self.foundations.copy())
     
     def is_solved(self):
         # Check if all foundations are complete
@@ -37,7 +37,7 @@ class FreeCellState:
         tableau = [[Card.from_dict(card) for card in col] for col in state['tableau']]
         free_cells = [Card.from_dict(card) if card else None for card in state['free_cells']]
         foundations = state['foundations']
-        return FreeCellState(tableau, free_cells, foundations)
+        return FreecellState(tableau, free_cells, foundations)
 
     @staticmethod
     def create_random_state():
@@ -50,20 +50,24 @@ class FreeCellState:
         for i, card in enumerate(deck):
             tableau[i % 8].append(card)
         
-        return FreeCellState(tableau)
+        return FreecellState(tableau)
 
     @staticmethod
     def load_presets(filename):
-        with open(filename, 'r') as f:
+        with open(os.path.join('saves', filename), 'r') as f:
             presets = json.load(f)
         return presets
-
+    
+    @staticmethod
+    def get_presets_name(presets):
+        return [preset["name"] for preset in presets]
+    
     @staticmethod
     def create_from_preset(preset):
         tableau = [[Card.from_dict(card) for card in col] for col in preset['tableau']]
         free_cells = [Card.from_dict(card) if card else None for card in preset['free_cells']]
         foundations = preset['foundations']
-        return FreeCellState(tableau, free_cells, foundations)
+        return FreecellState(tableau, free_cells, foundations)
 
     def save_state(self):
         self.history.append(self.copy())

@@ -14,7 +14,7 @@
         "free_cells": [null, null, null, null],
         "foundations": {"hearts": 0, "diamonds": 0, "clubs": 0, "spades": 0}
     },
-
+    
     {
         "name": "MS Deal 10913",
         "tableau": [

@@ -1,4 +1,4 @@
-from FreecellState import FreeCellState
+from FreeCellState import FreecellState
 from Move import Move
 
 def solve_game(game):
