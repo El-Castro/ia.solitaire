@@ -63,7 +63,7 @@ def can_move_to_tableau(state, card, column):
     if not state.tableau[column]:
         return True
     top_card = state.tableau[column][-1]
-    return (card.rank == top_card.rank - 1) and (card.get_colour() != top_card.get_colour())
+    return (card.rank == top_card.rank - 1) and (card.colour != top_card.colour)
 
 def can_move_to_freecell(state):
     # Check if there is an empty free cell to move the card to

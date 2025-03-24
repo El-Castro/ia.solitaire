@@ -1,36 +1,46 @@
 from FreecellState import FreecellState
 from Move import Move
+import heapq
+
+def heuristic(state):
+    # Heuristic function to estimate the cost to the goal
+    foundation_score = sum(13 - state.foundations[suit] for suit in state.foundations)
+    blocking_cards = sum(len(col) - 1 for col in state.tableau if col)
+    free_cells = sum(1 for cell in state.free_cells if cell)
+    return foundation_score + blocking_cards + free_cells
 
 def solve_game(game):
-    def dfs(state, visited):
-        if state.is_solved():
-            return True
-        state_key = state_to_key(state)
-        if state_key in visited:
-            return False
-        visited.add(state_key)
-        possible_moves = state.get_possible_moves()
-        for move in sorted(possible_moves, key=move_heuristic):
-            new_state = state.copy().apply_move(move)
-            if new_state and dfs(new_state, visited):
-                return True
-        return False
+    open_set = []
+    game.set_heuristic(heuristic)
+    heapq.heappush(open_set, (0 + heuristic(game), 0, game))
+    came_from = {}
+    g_score = {game: 0}
+    f_score = {game: heuristic(game)}
 
-    def state_to_key(state):
-        # Create a unique key for the state to track visited states
-        return (tuple(tuple(col) for col in state.tableau),
-                tuple(state.free_cells),
-                tuple(state.foundations.items()))
+    while open_set:
+        _, current_g, current = heapq.heappop(open_set)
 
-    def move_heuristic(move):
-        # Heuristic to prioritize moves that advance cards to the foundation
-        if move.move_type in ["tableau_to_foundation", "freecell_to_foundation"]:
-            return 0
-        return 1
+        if current.is_solved():
+            return reconstruct_path(came_from, current)
 
-    visited = set()
-    if dfs(game, visited):
-        print("Game solved!")
-        return True
-    print("No solution found.")
-    return False
+        for move in current.get_possible_moves():
+            neighbor = current.copy().apply_move(move)
+            neighbor.set_heuristic(heuristic)
+            tentative_g_score = current_g + 1
+
+            if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
+                came_from[neighbor] = (current, move)
+                g_score[neighbor] = tentative_g_score
+                f_score[neighbor] = tentative_g_score + heuristic(neighbor)
+                heapq.heappush(open_set, (f_score[neighbor], tentative_g_score, neighbor))
+
+    return None
+
+def reconstruct_path(came_from, current):
+    total_path = []
+    while current in came_from:
+        current, move = came_from[current]
+        total_path.append(move)
+    total_path.reverse()
+    return total_path
+

@@ -81,7 +81,7 @@ class FreecellState:
         return self
 
     def apply_move(self, move):
-        print("Apply move")
+        print("Apply move: " + move.__repr__())
         move_type = move.move_type
         new_state = None
         if move_type == "tableau_to_foundation":
@@ -124,3 +124,19 @@ class FreecellState:
         for move in moves:
             self.apply_move(move)
         return self
+
+    def set_heuristic(self, heuristic_func):
+        self.heuristic = heuristic_func
+
+    def __hash__(self):
+        return hash((tuple(tuple(col) for col in self.tableau), 
+                    tuple(self.free_cells), 
+                    tuple(sorted(self.foundations.items()))))
+
+    def __eq__(self, other):
+        return (self.tableau == other.tableau and
+                self.free_cells == other.free_cells and
+                self.foundations == other.foundations)
+
+    def __lt__(self, other):
+        return self.heuristic(self) < other.heuristic(other)

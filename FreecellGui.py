@@ -37,7 +37,8 @@ class FreeCellGUI:
         self.setup_buttons()
 
         self.draw_board()
-         
+
+
     def setup_buttons(self):
         """Creates and places buttons that remain static"""
         self.solve_button = Button(self.root, text="Solve Game", command=self.solve_game)
@@ -58,6 +59,7 @@ class FreeCellGUI:
         ]
         self.update_timer() 
 
+
     def update_timer(self):
         if self.running:
             elapsed_time = int(time.time() - self.start_time)  # Calculate elapsed time
@@ -69,6 +71,7 @@ class FreeCellGUI:
 
         # Schedule the next update after exactly 1000ms
         self.timer_after_id = self.root.after(1000, self.update_timer)
+
 
     def load_card_image(self, card):
         """Loads and resizes the card image"""
@@ -131,7 +134,6 @@ class FreeCellGUI:
                 self.canvas.tag_bind(rect_id, "<Button-1>", lambda event, type="tableau", index=i, isCard=False: self.handle_click(type, index, isCard))
 
 
-
     def draw_card(self, card, x, y, type, index, isCard):
         image = self.load_card_image(card)
         img_id = self.canvas.create_image(x + 30, y + 45, image=image, anchor="center")  # Center the image
@@ -190,8 +192,14 @@ class FreeCellGUI:
 
 
     def solve_game(self):
-        if solve_game(self.game):
+        result = solve_game(self.game)
+        if result is not None:
             print("Game solved by AI!")
+            for move in result:
+                self.game = self.game.apply_move(move)
+                self.draw_board()
+                self.root.update_idletasks()
+                time.sleep(0.5)  # Add a delay to visualize the moves
         else:
             print("AI could not solve the game.")
 
@@ -223,6 +231,7 @@ class FreeCellGUI:
             return (50 + index * 100, 200 + (len(column) - 1) * 30)
         return (0, 0)  # Default value if type is unknown
 
+
     def save_game(self):
         """Stops the timer and saves the game"""
         if hasattr(self, 'timer_after_id'):
@@ -232,6 +241,7 @@ class FreeCellGUI:
         FreecellState.save_to_file(self.game, "saved_game.json")
         print("Game saved successfully!")
     
+
     def undo_move(self):
         self.game.undo()
         self.draw_board()
