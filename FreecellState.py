@@ -2,8 +2,6 @@ from Card import Card
 from Move import Move
 import FreecellMove as fcm
 import random
-import copy
-import heapq
 import os
 import json
 
@@ -125,8 +123,12 @@ class FreecellState:
             self.apply_move(move)
         return self
 
-    def set_heuristic(self, heuristic_func):
-        self.heuristic = heuristic_func
+    def heuristic(self):
+        # Heuristic function to estimate the cost to the goal
+        foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
+        blocking_cards = sum(len(col) - 1 for col in self.tableau if col)
+        free_cells = sum(1 for cell in self.free_cells if cell)
+        return foundation_score + blocking_cards + free_cells
 
     def __hash__(self):
         return hash((tuple(tuple(col) for col in self.tableau), 
@@ -139,4 +141,4 @@ class FreecellState:
                 self.foundations == other.foundations)
 
     def __lt__(self, other):
-        return self.heuristic(self) < other.heuristic(other)
+        return self.heuristic() < other.heuristic()
