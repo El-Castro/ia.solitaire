@@ -20,6 +20,7 @@ class FreeCellGUI:
 
 
     def setup_ui(self):
+        """Sets up the user interface for the FreeCell game."""
         self.root.title("FreeCell Solitaire")
         self.canvas = tk.Canvas(self.root, width=850, height=600)
         self.canvas.pack()
@@ -40,10 +41,10 @@ class FreeCellGUI:
 
 
     def setup_buttons(self):
-        """Creates and places buttons that remain static"""
+        """Creates and places buttons that remain static."""
         self.solve_button = Button(self.root, text="Solve Game", command=self.solve_game)
         self.save_button = Button(self.root, text="Save Game", command=self.save_game)
-        self.undo_button = Button(self.root, text="Undo",command=self.undo_move)
+        self.undo_button = Button(self.root, text="Undo", command=self.undo_move)
 
         self.start_time = time.time()  # Get the current time
         self.running = True  # Ensure the timer runs
@@ -61,6 +62,7 @@ class FreeCellGUI:
 
 
     def update_timer(self):
+        """Updates the timer label every second."""
         if self.running:
             elapsed_time = int(time.time() - self.start_time)  # Calculate elapsed time
             minutes = elapsed_time // 60
@@ -74,7 +76,7 @@ class FreeCellGUI:
 
 
     def load_card_image(self, card):
-        """Loads and resizes the card image"""
+        """Loads and resizes the card image."""
         card_name = f"{card.rank}_of_{card.suit}.png"  # Ensure image filenames match this format
         if card_name not in self.card_images:
             image = Image.open(f"assets/cards/{card_name}")  # Adjust the path to your images
@@ -84,12 +86,12 @@ class FreeCellGUI:
 
 
     def draw_board(self):
+        """Draws the game board, including free cells, foundations, and tableau."""
         for item in self.canvas.find_all():
             if item not in self.button_ids:  # Prevent deletion of buttons and timer
                 self.canvas.delete(item)
         # Re-add background image after clearing the canvas
         self.canvas.create_image(0, 0, image=self.bg_photo, anchor="nw")
-        #self.setup_buttons()
 
         # Draw Free Cells
         for i in range(4):
@@ -135,6 +137,7 @@ class FreeCellGUI:
 
 
     def draw_card(self, card, x, y, type, index, isCard):
+        """Draws a card at the specified position."""
         image = self.load_card_image(card)
         img_id = self.canvas.create_image(x + 30, y + 45, image=image, anchor="center")  # Center the image
 
@@ -143,6 +146,7 @@ class FreeCellGUI:
 
 
     def handle_click(self, type, index, isCard):
+        """Handles click events on cards and empty slots."""
         print(type)
         print(index)
 
@@ -192,6 +196,7 @@ class FreeCellGUI:
 
 
     def solve_game(self):
+        """Solves the game using AI and visualizes the moves."""
         result = solve_game(self.game)
         if result is not None:
             print("Game solved by AI!")
@@ -205,7 +210,7 @@ class FreeCellGUI:
 
 
     def highlight_card(self, x, y):
-        """Draws a highlight rectangle around the selected card"""
+        """Draws a highlight rectangle around the selected card."""
         self.remove_highlight()  # Remove previous highlight if exists
         self.highlight_id = self.canvas.create_rectangle(
             x, y, x+60, y+90, outline="yellow", width=4
@@ -213,14 +218,14 @@ class FreeCellGUI:
 
 
     def remove_highlight(self):
-        """Removes the highlight rectangle"""
+        """Removes the highlight rectangle."""
         if self.highlight_id:
             self.canvas.delete(self.highlight_id)
             self.highlight_id = None
 
 
     def get_card_position(self, type, index):
-        """Returns the x, y position of a card based on its type and index"""
+        """Returns the x, y position of a card based on its type and index."""
         if type == "freecell":
             return (50 + index * 100, 50)
         elif type == "foundation":
@@ -233,7 +238,7 @@ class FreeCellGUI:
 
 
     def save_game(self):
-        """Stops the timer and saves the game"""
+        """Stops the timer and saves the game."""
         if hasattr(self, 'timer_after_id'):
             self.running = False  # Stop the timer
             self.root.after_cancel(self.timer_after_id)
@@ -241,8 +246,9 @@ class FreeCellGUI:
         FreecellState.save_to_file(self.game, "saved_game.json")
         print("Game saved successfully!")
     
-
+    
     def undo_move(self):
+        """Undoes the last move and redraws the board."""
         self.game.undo()
         self.draw_board()
         print("Undo")

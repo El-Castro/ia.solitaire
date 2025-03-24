@@ -8,10 +8,12 @@ from FreecellGui import FreeCellGUI
 
 class FreecellMenu:
     def __init__(self, root):
+        """Initialize the FreecellMenu with the given root window."""
         self.root = root
         self.setup_menu()
 
     def setup_menu(self):
+        """Set up the main menu interface."""
         self.root.title("FreeCell Solitaire")
         self.canvas = tk.Canvas(self.root, width=850, height=600)
         self.canvas.pack()
@@ -37,7 +39,7 @@ class FreecellMenu:
         self.canvas.create_window(425, 340, window=self.exit_button, width=200, height=50)
 
     def load_game(self):
-        #Load saved game state
+        """Load a saved game state."""
         print("Loading saved game...")
         try:
             # Load saved game state
@@ -51,11 +53,12 @@ class FreecellMenu:
         except json.JSONDecodeError:
             print("Error: presets.json is not properly formatted.")
 
-
     def exit_game(self):
+        """Exit the game."""
         self.root.quit()
     
     def new_game_menu(self):
+        """Display the new game menu."""
         self.canvas.delete("all")
         self.canvas.create_image(0, 0, image=self.bg_photo, anchor="nw")
 
@@ -71,7 +74,7 @@ class FreecellMenu:
         self.canvas.create_window(620, 270, window=self.back_button, width=150, height=50)
     
     def start_random_game(self):
-        #Update a window for a new with random option
+        """Update a window for a new game with random option."""
         game = FreecellState.create_random_state()
         
         for widget in self.root.winfo_children():
@@ -80,7 +83,7 @@ class FreecellMenu:
         FreeCellGUI(self.root, game)
     
     def preset_game_options(self):
-        #Load presets and dynamically creates buttons for each preset
+        """Load presets and dynamically creates buttons for each preset."""
         print("Loading Preset Menu")
         try:
             # Load saved presets
@@ -111,7 +114,7 @@ class FreecellMenu:
             print("Error: presets.json is not properly formatted.")
 
     def start_game(self, preset):
-        #Start the game with the selected preset
+        """Start the game with the selected preset."""
         game = FreecellState.create_from_preset(preset)
 
         for widget in self.root.winfo_children():
@@ -120,14 +123,14 @@ class FreecellMenu:
         FreeCellGUI(self.root, game)
     
     def back_button(self):
-        #Back button
+        """Back button."""
         for widget in self.root.winfo_children():
             widget.destroy()
         self.setup_menu()
     
     #duplicated function cause python does not allow to use the same 
     def back_to_menu(self):
-        #Back button
+        """Go back to the menu."""
         for widget in self.root.winfo_children():
             widget.destroy()
         self.setup_menu()
