@@ -124,11 +124,13 @@ class FreecellState:
         return self
 
     def heuristic(self):
-        # Heuristic function to estimate the cost to the goal
         foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
         blocking_cards = sum(len(col) - 1 for col in self.tableau if col)
         free_cells = sum(1 for cell in self.free_cells if cell)
-        return foundation_score + blocking_cards + free_cells
+        
+        # Adjust weights based on experimentation
+        return 3 * foundation_score + 2 * blocking_cards + 4 * free_cells
+
 
     def __hash__(self):
         return hash((tuple(tuple(col) for col in self.tableau), 
