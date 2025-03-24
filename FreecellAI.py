@@ -1,4 +1,4 @@
-from FreeCellState import FreecellState
+from FreecellState import FreecellState
 from Move import Move
 
 def solve_game(game):
@@ -12,7 +12,7 @@ def solve_game(game):
         possible_moves = state.get_possible_moves()
         for move in sorted(possible_moves, key=move_heuristic):
             new_state = state.copy().apply_move(move)
-            if dfs(new_state, visited):
+            if new_state and dfs(new_state, visited):
                 return True
         return False
 

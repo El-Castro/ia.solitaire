@@ -2,11 +2,11 @@ import time
 import tkinter as tk
 from tkinter import Button, PhotoImage
 from PIL import Image, ImageTk
-import FreeCellMove
+import FreecellMove
 from Card import Card
 from Move import Move
-from FreeCellAI import solve_game
-from FreeCellState import FreecellState
+from FreecellAI import solve_game
+from FreecellState import FreecellState
 
 class FreeCellGUI:
     def __init__(self, root, game):
@@ -176,7 +176,7 @@ class FreeCellGUI:
             move = Move(move_type, src_index, dest_index)
 
             print(f"Selected move: {move}")
-            possible_moves = FreeCellMove.get_possible_moves(self.game)
+            possible_moves = FreecellMove.get_possible_moves(self.game)
             if move in possible_moves:
                 self.game = self.game.apply_move(move)
             else: 
@@ -186,6 +186,7 @@ class FreeCellGUI:
             self.selected = None
             self.remove_highlight()
             self.draw_board()
+            if self.game.is_solved() : print("Game Solved!")
 
 
     def solve_game(self):
@@ -232,5 +233,6 @@ class FreeCellGUI:
         print("Game saved successfully!")
     
     def undo_move(self):
-        FreecellState.undo(self.game)
+        self.game.undo()
+        self.draw_board()
         print("Undo")

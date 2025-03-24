@@ -3,8 +3,8 @@ import os
 import json
 from tkinter import Button
 from PIL import Image, ImageTk
-from FreeCellState import FreecellState
-from FreeCellGui import FreeCellGUI
+from FreecellState import FreecellState
+from FreecellGui import FreeCellGUI
 
 class FreecellMenu:
     def __init__(self, root):

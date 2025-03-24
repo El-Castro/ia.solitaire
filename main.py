@@ -1,7 +1,7 @@
 from tkinter import Tk
 #from FreeCellGui import FreeCellGUI
 #from FreeCellState import FreeCellState
-from FreeCellMenu import FreecellMenu
+from FreecellMenu import FreecellMenu
 
 def main():
     #Show the menu 

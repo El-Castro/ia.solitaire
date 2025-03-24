@@ -1,6 +1,6 @@
 from Card import Card
 from Move import Move
-import FreeCellMove as fcm
+import FreecellMove as fcm
 import random
 import copy
 import heapq
@@ -19,7 +19,7 @@ class FreecellState:
     
     def is_solved(self):
         # Check if all foundations are complete
-        return all(len(self.foundations[suit]) == 13 for suit in self.foundations)
+        return all(self.foundations[suit] == 13 for suit in self.foundations)
 
     def save_to_file(self, filename):
         state = {
@@ -78,24 +78,32 @@ class FreecellState:
             self.tableau = previous_state.tableau
             self.free_cells = previous_state.free_cells
             self.foundations = previous_state.foundations
+        return self
 
     def apply_move(self, move):
         print("Apply move")
         move_type = move.move_type
+        new_state = None
         if move_type == "tableau_to_foundation":
-            return fcm.move_tableau_to_foundation(self, move.source)
+            new_state = fcm.move_tableau_to_foundation(self, move.source)
         elif move_type == "tableau_to_freecell":
-            return fcm.move_tableau_to_freecell(self, move.source)
+            new_state = fcm.move_tableau_to_freecell(self, move.source)
         elif move_type == "freecell_to_foundation":
-            return fcm.move_freecell_to_foundation(self, move.source)
+            new_state = fcm.move_freecell_to_foundation(self, move.source)
         elif move_type == "tableau_to_tableau":
-            return fcm.move_tableau_to_tableau(self, move.source, move.destination)
+            new_state = fcm.move_tableau_to_tableau(self, move.source, move.destination)
         elif move_type == "freecell_to_tableau":
-            return fcm.move_freecell_to_tableau(self, move.source, move.destination)
+            new_state = fcm.move_freecell_to_tableau(self, move.source, move.destination)
         elif move_type == "foundation_to_tableau":
-            return fcm.move_foundation_to_tableau(self, move.source, move.destination)
+            new_state = fcm.move_foundation_to_tableau(self, move.source, move.destination)
         elif move_type == "foundation_to_freecell":
-            return fcm.move_foundation_to_freecell(self, move.source, move.destination)
+            new_state = fcm.move_foundation_to_freecell(self, move.source, move.destination)
+        
+        if new_state:
+            self.save_state()  # Save current state before applying the move
+            self.tableau = new_state.tableau
+            self.free_cells = new_state.free_cells
+            self.foundations = new_state.foundations
         return self
     
     def auto_drag_foundation(self):
