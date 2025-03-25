@@ -83,6 +83,7 @@ def move_tableau_to_foundation(state, col):
             new_state = state.copy()
             new_state.tableau[col].pop()
             new_state.foundations[card.suit] = card.rank
+            print(f"{card.rank} of {card.suit}\n")
             return new_state
     return None
 
@@ -92,6 +93,7 @@ def move_tableau_to_freecell(state, col):
         for i in range(len(state.free_cells)):
             if state.free_cells[i] is None:  # Find an empty FreeCell
                 new_state = state.copy()
+                print(f"{new_state.tableau[col][-1].rank} of {new_state.tableau[col][-1].suit}\n")
                 new_state.free_cells[i] = new_state.tableau[col].pop()  # Modify the copied state
                 return new_state
     return None
@@ -104,6 +106,7 @@ def move_freecell_to_foundation(state, fc):
             new_state = state.copy()
             new_state.free_cells[fc] = None
             new_state.foundations[card.suit] = card.rank
+            print(f"{card.rank} of {card.suit}\n")
             return new_state
     return None
 
@@ -114,6 +117,7 @@ def move_tableau_to_tableau(state, src, dest):
         if can_move_to_tableau(state, card, dest):
             new_state = state.copy()
             new_state.tableau[dest].append(new_state.tableau[src].pop())
+            print(f"{card.rank} of {card.suit}\n")
             return new_state
     return None
 
@@ -125,6 +129,7 @@ def move_freecell_to_tableau(state, fc, col):
             new_state = state.copy()
             new_state.tableau[col].append(card)
             new_state.free_cells[fc] = None
+            print(f"{card.rank} of {card.suit}\n")
             return new_state
     return None
 
@@ -136,16 +141,19 @@ def move_foundation_to_tableau(state, suit, col):
             new_state = state.copy()
             new_state.foundations[suit] -= 1
             new_state.tableau[col].append(card)
+            print(f"{card.rank} of {card.suit}\n")
             return new_state
     return None
 
-def move_foundation_to_freecell(state, suit, fc):
+def move_foundation_to_freecell(state, suit):
     """Move a card from foundation to freecell (rare case)"""
     if suit in state.foundations and state.foundations[suit] > 0:
         for i in range(len(state.free_cells)):
             if state.free_cells[i] is None:
+                new_card=Card(state.foundations[suit], suit)
                 new_state = state.copy()
-                new_state.free_cells[i] = Card(state.foundations[suit], suit)
+                new_state.free_cells[i] = new_card
                 new_state.foundations[suit] -= 1
+                print(f"{new_card.rank} of {new_card.suit}\n")
                 return new_state
     return None

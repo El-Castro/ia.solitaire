@@ -51,5 +51,6 @@ def reconstruct_path(came_from, current):
         current, move = came_from[current]
         total_path.append(move)
     total_path.reverse()  # Reverse the path to get it from start to goal
+    print(f"{len(total_path)}\n")
     return total_path
 

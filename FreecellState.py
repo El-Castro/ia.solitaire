@@ -97,7 +97,7 @@ class FreecellState:
 
     def apply_move(self, move):
         """Applies a given move to the current FreecellState, creating the new state."""
-        print("Apply move: " + move.__repr__())
+        #print("Apply move: " + move.__repr__())
         move_type = move.move_type
         new_state = None
         if move_type == "tableau_to_foundation":
@@ -113,7 +113,7 @@ class FreecellState:
         elif move_type == "foundation_to_tableau":
             new_state = fcm.move_foundation_to_tableau(self, move.source, move.destination)
         elif move_type == "foundation_to_freecell":
-            new_state = fcm.move_foundation_to_freecell(self, move.source, move.destination)
+            new_state = fcm.move_foundation_to_freecell(self, move.source)
         
         if new_state:
             self.save_state()  # Save current state before applying the move
@@ -129,15 +129,17 @@ class FreecellState:
 
 # Heuristic -----------------------------------------------------------------------------------------------------------------------------
 
-
+    """Calculates a heuristic value for the current FreecellState."""
     def heuristic(self):
-        """Calculates a heuristic value for the current FreecellState."""
+        
         foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
         blocking_cards = sum(len(col) - 1 for col in self.tableau if col)
         free_cells = sum(1 for cell in self.free_cells if cell)
         
         # Adjust weights based on experimentation
-        return 3 * foundation_score + 2 * blocking_cards + 4 * free_cells
+        score = 3* foundation_score + 2 * blocking_cards + 4 * free_cells 
+        print(f"{score}\n")
+        return score
 
 
     # Efficiency improvement attempt (in progress)
@@ -146,30 +148,34 @@ class FreecellState:
         
     #     # Efficient tracking of the next needed card for each suit
     #     next_needed = {suit: self.foundations[suit] + 1 for suit in self.foundations}
+    #     free_cells = 0
+    #     free_columns = 0
+    #     blocked_next_cards = 0
 
+    #     #free_columns = sum(1 for col in self.tableau if not col)
+    #     #free_cells = sum(1 for cell in self.free_cells if cell)
+        
     #     for card in self.free_cells:
     #         if card:
+    #             free_cells += 1
     #             suit, rank = card.suit, card.rank
     #             if suit in next_needed and rank == next_needed[suit]:
     #                 del next_needed[suit]  # Remove immediately (already accessible)
 
-    #     blocked_next_cards = 0
-
     #     for col in self.tableau:
-    #         for depth, card in enumerate(col):  # Iterate from top to bottom
-    #             suit, rank = card.suit, card.rank
-    #             if suit in next_needed and rank == next_needed[suit]:  # It's a needed card
-    #                 blocked_next_cards += depth  # Penalize based on how deep it's buried
-    #                 del next_needed[suit]  # Remove suit from tracking
-    #                 if not next_needed:  # Stop once all 4 suits are found
-    #                     break
-    #         if not next_needed:  
+    #         if not col: free_columns += 1
+    #         else:
+    #             for depth, card in enumerate(col):  # Iterate from top to bottom
+    #                 suit, rank = card.suit, card.rank
+    #                 if suit in next_needed and rank == next_needed[suit]:  # It's a needed card
+    #                     blocked_next_cards += depth  # Penalize based on how deep it's buried
+    #                     del next_needed[suit]  # Remove suit from tracking
+    #                     if not next_needed:  # Stop once all 4 suits are found
+    #                         break
+    #         if not next_needed:
     #             break  # No need to keep searching
 
-    #     free_columns = sum(1 for col in self.tableau if not col)
-    #     free_cells = sum(1 for cell in self.free_cells if cell is None)
-
-    #     return 3 * foundation_score + 2 * blocked_next_cards - 3 * free_cells - 4 * free_columns
+    #     return 3 * foundation_score + 2 * blocked_next_cards + 4 * free_cells - 5 * free_columns
 
 
 # Dunder Methods -----------------------------------------------------------------------------------------------------------------------------
