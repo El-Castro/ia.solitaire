@@ -14,6 +14,7 @@ class FreeCellGUI:
         self.game = game
         self.card_images = {}
         self.highlight_id = None
+        # Load saved time instead of resetting it
         self.minutes = 0
         self.seconds = 0
         self.setup_ui()
@@ -37,7 +38,7 @@ class FreeCellGUI:
         self.setup_buttons()
 
         self.draw_board()
-
+  
 
     def setup_buttons(self):
         """Creates and places buttons that remain static"""
@@ -62,17 +63,28 @@ class FreeCellGUI:
 
     def update_timer(self):
         if self.running:
-            elapsed_time = int(time.time() - self.start_time)  # Calculate elapsed time
-            minutes = elapsed_time // 60
-            seconds = elapsed_time % 60
+            print(f"GAME MINUTES in timer {self.game.minutes} , {self.game.seconds}")
+            if self.game.minutes != None or self.game.seconds != None:
+                #self.start_time = time.time() - (self.game.minutes* 60 + self.game.minutes)
+                elapsed_time = int((self.game.minutes * 60 + self.game.seconds + time.time()) - self.start_time)
+                print(f"START_TIME from save: {self.start_time} seconds")
+            else:
+                print(f"START_TIME initialized to current time: {self.start_time}")
+                elapsed_time = int(time.time() - self.start_time)
+            # Calculate elapsed time since start_time
+            
+            self.minutes = elapsed_time // 60
+            self.seconds = elapsed_time  % 60
 
-        # Update timer label
-        self.timer_label.config(text=f"Time: {minutes:02}:{seconds:02}")
+            # Update the timer label to reflect the current minutes and seconds
+            self.timer_label.config(text=f"Time: {self.minutes:02}:{self.seconds:02}")
 
-        # Schedule the next update after exactly 1000ms
-        self.timer_after_id = self.root.after(1000, self.update_timer)
+            # Schedule the next update after 1000ms (1 second)
+            self.timer_after_id = self.root.after(1000, self.update_timer)
 
 
+
+        
     def load_card_image(self, card):
         """Loads and resizes the card image"""
         card_name = f"{card.rank}_of_{card.suit}.png"  # Ensure image filenames match this format
@@ -235,9 +247,11 @@ class FreeCellGUI:
     def save_game(self):
         """Stops the timer and saves the game"""
         if hasattr(self, 'timer_after_id'):
+            self.game.minutes = self.minutes
+            self.game.seconds = self.seconds
+            print(f"Saving time: {self.minutes} minutes, {self.seconds} seconds")
             self.running = False  # Stop the timer
             self.root.after_cancel(self.timer_after_id)
-       
         FreecellState.save_to_file(self.game, "saved_game.json")
         print("Game saved successfully!")
     
