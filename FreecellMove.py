@@ -1,8 +1,9 @@
 from Card import Card
 from Move import Move
 
+
 def get_possible_moves(state):
-    # Get all possible moves from the current state
+    """Get all possible moves from the state"""
     moves = []
     for i, column in enumerate(state.tableau):
         if column:
@@ -50,30 +51,42 @@ def get_possible_moves(state):
     return moves
 
 
-# Checking if move is possible ---------------------------------------------------------------------------------------------------------------
+# Individual Move Possibility ---------------------------------------------------------------------------------------------------------------
+
 
 def can_move_to_foundation(state, card):
-    # Check if a card can be moved to the foundation
+    """Check if a card can be moved to the foundation"""
     suit, rank = card.suit, card.rank
     foundation = state.foundations.get(suit, 0)
     return (rank == 1 and foundation == 0) or (foundation == rank - 1)
 
 def can_move_to_tableau(state, card, column):
-    # Check if a card can be moved to a tableau column
+    """Check if a card can be moved to a tableau column"""
     if not state.tableau[column]:
         return True
     top_card = state.tableau[column][-1]
     return (card.rank == top_card.rank - 1) and (card.colour != top_card.colour)
 
 def can_move_to_freecell(state):
-    # Check if there is an empty free cell to move the card to
+    """Check if there is an empty free cell to move the card to"""
     return None in state.free_cells
 
 
-# Execute move --------------------------------------------------------------------------------------------------------------------------------
+# Individual Move Executioners --------------------------------------------------------------------------------------------------------------------------------
 
 
 def move_tableau_to_foundation(state, col):
+    """
+    Move a card from tableau to foundation
+    Preconditions:
+    - The tableau column `col` is not empty.
+    - The top card of the tableau column can be moved to the foundation.
+    Effects:
+    - The top card is removed from the tableau column.
+    - The card is added to the foundation.
+    Costs:
+    - Typically, the cost is 1 move.
+    """
     if state.tableau[col]:  # Ensure column is not empty
         card = state.tableau[col][-1]
         if can_move_to_foundation(state, card):
@@ -83,8 +96,18 @@ def move_tableau_to_foundation(state, col):
             return new_state
     return None
 
-# Move from tableau to freecell
 def move_tableau_to_freecell(state, col):
+    """
+    Move a card from tableau to freecell
+    Preconditions:
+    - The tableau column `col` is not empty.
+    - There is at least one empty free cell.
+    Effects:
+    - The top card is removed from the tableau column.
+    - The card is placed in an empty free cell.
+    Costs:
+    - Typically, the cost is 1 move.
+    """
     if state.tableau[col]:  # Ensure column is not empty
         for i in range(len(state.free_cells)):
             if state.free_cells[i] is None:  # Find an empty FreeCell
@@ -93,8 +116,18 @@ def move_tableau_to_freecell(state, col):
                 return new_state
     return None
 
-# Move from freecell to foundation
 def move_freecell_to_foundation(state, fc):
+    """
+    Move a card from freecell to foundation
+    Preconditions:
+    - The free cell `fc` is not empty.
+    - The card in the free cell can be moved to the foundation.
+    Effects:
+    - The card is removed from the free cell.
+    - The card is added to the foundation.
+    Costs:
+    - Typically, the cost is 1 move.
+    """
     if state.free_cells[fc] is not None:
         card = state.free_cells[fc]
         if can_move_to_foundation(state, card):
@@ -104,8 +137,18 @@ def move_freecell_to_foundation(state, fc):
             return new_state
     return None
 
-# Move from tableau to tableau
 def move_tableau_to_tableau(state, src, dest):
+    """
+    Move a card from one tableau column to another
+    Preconditions:
+    - The source tableau column `src` is not empty.
+    - The top card of the source column can be moved to the destination column `dest`.
+    Effects:
+    - The top card is removed from the source tableau column.
+    - The card is added to the destination tableau column.
+    Costs:
+    - Typically, the cost is 1 move.
+    """
     if state.tableau[src]:  # Ensure source is not empty
         card = state.tableau[src][-1]
         if can_move_to_tableau(state, card, dest):
@@ -114,8 +157,18 @@ def move_tableau_to_tableau(state, src, dest):
             return new_state
     return None
 
-# Move from freecell to tableau
 def move_freecell_to_tableau(state, fc, col):
+    """
+    Move a card from freecell to tableau
+    Preconditions:
+    - The free cell `fc` is not empty.
+    - The card in the free cell can be moved to the tableau column `col`.
+    Effects:
+    - The card is removed from the free cell.
+    - The card is added to the tableau column.
+    Costs:
+    - Typically, the cost is 1 move.
+    """
     if state.free_cells[fc] is not None:
         card = state.free_cells[fc]
         if can_move_to_tableau(state, card, col):
@@ -125,8 +178,18 @@ def move_freecell_to_tableau(state, fc, col):
             return new_state
     return None
 
-# Move from foundation to tableau
 def move_foundation_to_tableau(state, suit, col):
+    """
+    Move a card from foundation to tableau
+    Preconditions:
+    - The foundation for the suit is not empty.
+    - The card can be moved to the tableau column `col`.
+    Effects:
+    - The card is removed from the foundation.
+    - The card is added to the tableau column.
+    Costs:
+    - Typically, the cost is 1 move.
+    """
     if suit in state.foundations and state.foundations[suit] > 0:
         card = Card(state.foundations[suit], suit)
         if can_move_to_tableau(state, card, col):
@@ -136,8 +199,18 @@ def move_foundation_to_tableau(state, suit, col):
             return new_state
     return None
 
-# Move from foundation to freecell (rare case)
-def move_foundation_to_freecell(state, suit, fc):
+def move_foundation_to_freecell(state, suit):
+    """
+    Move a card from foundation to freecell (rare case)
+    Preconditions:
+    - The foundation for the suit is not empty.
+    - There is at least one empty free cell.
+    Effects:
+    - The card is removed from the foundation.
+    - The card is placed in an empty free cell.
+    Costs:
+    - Typically, the cost is 1 move.
+    """
     if suit in state.foundations and state.foundations[suit] > 0:
         for i in range(len(state.free_cells)):
             if state.free_cells[i] is None:
