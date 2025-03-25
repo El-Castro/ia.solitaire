@@ -1,12 +1,17 @@
 import time
 import tkinter as tk
 from tkinter import Button, PhotoImage
+from tkinter import *
+import tkinter.messagebox 
+import tkinter
 from PIL import Image, ImageTk
 import FreecellMove
 from Card import Card
 from Move import Move
 from FreecellAI import solve_game
 from FreecellState import FreecellState
+import random
+
 
 class FreeCellGUI:
     def __init__(self, root, game):
@@ -45,6 +50,7 @@ class FreeCellGUI:
         self.solve_button = Button(self.root, text="Solve Game", command=self.solve_game)
         self.save_button = Button(self.root, text="Save Game", command=self.save_game)
         self.undo_button = Button(self.root, text="Undo",command=self.undo_move)
+        self.hint_button = Button(self.root, text="Hint",command=self.hint_move)
 
         self.start_time = time.time()  # Get the current time
         self.running = True  # Ensure the timer runs
@@ -53,25 +59,21 @@ class FreeCellGUI:
 
         # Place buttons and timer, store their IDs
         self.button_ids = [
-            self.canvas.create_window(170, 550, window=self.solve_button, width=110, height=35),
-            self.canvas.create_window(320, 550, window=self.save_button, width=110, height=35),
-            self.canvas.create_window(470, 550, window=self.undo_button, width=110, height=35),
-            self.canvas.create_window(750, 550, window=self.timer_label, width=100, height=35),
+            self.canvas.create_window(130, 550, window=self.solve_button, width=110, height=35),
+            self.canvas.create_window(280, 550, window=self.save_button, width=110, height=35),
+            self.canvas.create_window(430, 550, window=self.undo_button, width=110, height=35),
+            self.canvas.create_window(580, 550, window=self.hint_button, width=110, height=35),
+            self.canvas.create_window(750, 550, window=self.timer_label, width=120, height=35),
         ]
         self.update_timer() 
 
 
     def update_timer(self):
         if self.running:
-            print(f"GAME MINUTES in timer {self.game.minutes} , {self.game.seconds}")
             if self.game.minutes != None or self.game.seconds != None:
-                #self.start_time = time.time() - (self.game.minutes* 60 + self.game.minutes)
                 elapsed_time = int((self.game.minutes * 60 + self.game.seconds + time.time()) - self.start_time)
-                print(f"START_TIME from save: {self.start_time} seconds")
             else:
-                print(f"START_TIME initialized to current time: {self.start_time}")
                 elapsed_time = int(time.time() - self.start_time)
-            # Calculate elapsed time since start_time
             
             self.minutes = elapsed_time // 60
             self.seconds = elapsed_time  % 60
@@ -260,3 +262,38 @@ class FreeCellGUI:
         self.game.undo()
         self.draw_board()
         print("Undo")
+    
+    def hint_move(self):
+        #get possible free moves for the current state 
+        possible_moves = FreecellState.get_possible_moves(self.game)
+        if not possible_moves:
+            tkinter.messagebox.showinfo("Hint", "No available moves at the moment.")
+            return
+        #print(possible_moves)
+        list_size = len(possible_moves)
+        random_index = random.randrange(1, list_size)
+        #get ramdon move
+        hint_move = possible_moves[random_index]
+        move_type = hint_move.move_type
+
+        if move_type == "tableau_to_foundation":
+            hint_msg = f"Move a card from Tableau {hint_move.source} to Foundation {hint_move.suit}."
+        elif move_type == "tableau_to_freecell":
+            hint_msg = f"Move a card from Tableau {hint_move.source} to a Freecell."
+        elif move_type == "freecell_to_foundation":
+            hint_msg = f"Move a card from Freecell {hint_move.source} to Foundation {hint_move.suit}."
+        elif move_type == "tableau_to_tableau":
+            hint_msg = f"Move a card from Tableau {hint_move.source} to Tableau {hint_move.destination}."
+        elif move_type == "freecell_to_tableau":
+            hint_msg = f"Move a card from Freecell {hint_move.source} to Tableau {hint_move.destination}."
+        elif move_type == "foundation_to_tableau":
+            hint_msg = f"Move a card from Foundation {hint_move.source} to Tableau {hint_move.destination}."
+        elif move_type == "foundation_to_freecell":
+            hint_msg = f"Move a card from Foundation {hint_move.source} to a Freecell."
+        else:
+            hint_msg = "No valid moves found."
+
+        tkinter.messagebox.showinfo("Hint", hint_msg)
+
+
+
