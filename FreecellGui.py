@@ -50,12 +50,8 @@ class FreeCellGUI:
         """Creates and places buttons that remain static."""
         self.solve_button = Button(self.root, text="Solve Game", command=self.solve_game)
         self.save_button = Button(self.root, text="Save Game", command=self.save_game)
-<<<<<<< HEAD
         self.undo_button = Button(self.root, text="Undo",command=self.undo_move)
         self.hint_button = Button(self.root, text="Hint",command=self.hint_move)
-=======
-        self.undo_button = Button(self.root, text="Undo", command=self.undo_move)
->>>>>>> main
 
         self.start_time = time.time()  # Get the current time
         self.running = True  # Ensure the timer runs
@@ -218,13 +214,22 @@ class FreeCellGUI:
         result = solve_game(self.game)
         if result is not None:
             print("Game solved by AI!")
-            for move in result:
-                self.game = self.game.apply_move(move)
-                self.draw_board()
-                self.root.update_idletasks()
-                time.sleep(0.5)  # Add a delay to visualize the moves
+            self.winning_state()  # Call the method to remove buttons and display message
         else:
             print("AI could not solve the game.")
+
+
+    def winning_state(self):
+        """Removes all buttons and displays 'Game is over' message."""
+        # Remove all buttons from the canvas
+        self.canvas.delete("all")
+         # Load the background image (same as game UI)
+        self.bg_image = Image.open("assets/board.jpg")  
+        self.bg_image = self.bg_image.resize((850, 600), Image.LANCZOS)
+        self.bg_photo = ImageTk.PhotoImage(self.bg_image)
+        self.canvas.create_image(0, 0, image=self.bg_photo, anchor="nw")
+        # Display a game-over message
+        self.canvas.create_text(425, 300, text="Game Solved", font=("Arial", 36, "bold"), fill="white")
 
 
     def highlight_card(self, x, y):
@@ -305,11 +310,8 @@ class FreeCellGUI:
 
         tkinter.messagebox.showinfo("Hint", hint_msg)
 
-    def winning_state(self):
-        for widget in self.root.winfo_children():
-                widget.destroy()
-        self.timer_label = tk.Label(self.root, text="Game is over!", font=("Arial", 25), fg="white")
-        self.canvas.create_window(350, 350, window=self.timer_label, width=100, height=35)
+    
+        
         
 
 

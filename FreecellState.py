@@ -54,19 +54,11 @@ class FreecellState:
         tableau = [[Card.from_dict(card) for card in col] for col in state['tableau']]
         free_cells = [Card.from_dict(card) if card else None for card in state['free_cells']]
         foundations = state['foundations']
-<<<<<<< HEAD
-        # Ensure time data is extracted correctly
-        time_data = state.get('time', {"minutes": 0, "seconds": 0})
-        minutes = time_data.get("minutes", 0)
-        seconds = time_data.get("seconds", 0)
-        return FreecellState(tableau, free_cells, foundations, minutes,seconds)
-=======
         return FreecellState(tableau, free_cells, foundations)
     
     def save_state(self):
         """Saves the current state to the history for undo functionality."""
         self.history.append(self.copy())
->>>>>>> main
 
     @staticmethod
     def create_random_state():
