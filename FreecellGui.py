@@ -202,7 +202,7 @@ class FreeCellGUI:
             self.selected = None
             self.remove_highlight()
             self.draw_board()
-            if self.game.is_solved() : print("Game Solved!")
+            if self.game.is_solved() : self.winning_state()
 
 
     def solve_game(self):
@@ -294,6 +294,13 @@ class FreeCellGUI:
             hint_msg = "No valid moves found."
 
         tkinter.messagebox.showinfo("Hint", hint_msg)
+
+    def winning_state(self):
+        for widget in self.root.winfo_children():
+                widget.destroy()
+        self.timer_label = tk.Label(self.root, text="Game is over!", font=("Arial", 25), fg="white")
+        self.canvas.create_window(350, 350, window=self.timer_label, width=100, height=35)
+        
 
 
 
