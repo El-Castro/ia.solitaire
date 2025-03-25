@@ -6,11 +6,13 @@ import os
 import json
 
 class FreecellState:
-    def __init__(self, tableau, free_cells=None, foundations=None):
+    def __init__(self, tableau, free_cells=None, foundations=None,minutes = None, seconds = None):
         self.tableau = tableau  # 8 tableau columns
         self.free_cells = free_cells if free_cells else [None] * 4  # 4 free cells
         self.foundations = foundations if foundations else {suit: 0 for suit in ['hearts', 'diamonds', 'clubs', 'spades']}
         self.history = []
+        self.minutes = minutes
+        self.seconds = seconds
 
     def copy(self):
         """Creates a deep copy of the current FreecellState instance."""
@@ -38,7 +40,8 @@ class FreecellState:
         state = {
             'tableau': [[card.to_dict() for card in col] for col in self.tableau],
             'free_cells': [card.to_dict() if card else None for card in self.free_cells],
-            'foundations': self.foundations
+            'foundations': self.foundations,
+            'time': {"minutes": self.minutes, "seconds": self.seconds}
         }
         with open(os.path.join('saves', filename), 'w') as f:
             json.dump(state, f)
