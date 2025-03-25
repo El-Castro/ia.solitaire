@@ -113,7 +113,7 @@ class FreecellState:
         elif move_type == "foundation_to_tableau":
             new_state = fcm.move_foundation_to_tableau(self, move.source, move.destination)
         elif move_type == "foundation_to_freecell":
-            new_state = fcm.move_foundation_to_freecell(self, move.source, move.destination)
+            new_state = fcm.move_foundation_to_freecell(self, move.source)
         
         if new_state:
             self.save_state()  # Save current state before applying the move
