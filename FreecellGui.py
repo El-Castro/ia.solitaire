@@ -37,6 +37,7 @@ class FreeCellGUI:
         self.button_ids = [] 
         self.setup_buttons()
 
+        print(self.game.heuristic())
         self.draw_board()
 
 
@@ -147,8 +148,8 @@ class FreeCellGUI:
 
     def handle_click(self, type, index, isCard):
         """Handles click events on cards and empty slots."""
-        print(type)
-        print(index)
+        # print(type)
+        # print(index)
 
         if self.selected != None and self.selected[0] == "freecell" and type == "freecell":
             print("Freecell to Freecell move is irrelevant.")
@@ -185,6 +186,7 @@ class FreeCellGUI:
             possible_moves = FreecellMove.get_possible_moves(self.game)
             if move in possible_moves:
                 self.game = self.game.apply_move(move)
+                print(self.game.heuristic())
             else: 
                 print("Move not possible")
 
@@ -192,6 +194,8 @@ class FreeCellGUI:
             self.selected = None
             self.remove_highlight()
             self.draw_board()
+            print(self.game.heuristic())
+
             if self.game.is_solved() : print("Game Solved!")
 
 
