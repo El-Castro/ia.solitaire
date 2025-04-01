@@ -139,8 +139,10 @@ class FreecellState:
         blocking_cards = sum(len(col) - 1 for col in self.tableau if col)
         free_cells = sum(1 for cell in self.free_cells if cell)
         
+        print(0.003 * foundation_score + 0.002 * blocking_cards + 0.004 * free_cells)
+
         # Adjust weights based on experimentation
-        return 3 * foundation_score + 2 * blocking_cards + 4 * free_cells
+        return 0.003 * foundation_score + 0.002 * blocking_cards + 0.004 * free_cells
 
 
     # Efficiency improvement attempt (in progress)

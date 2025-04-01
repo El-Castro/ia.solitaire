@@ -11,7 +11,7 @@ def solve_game_astar(game):
 
     # Initialize the open set (priority queue) with the initial game state
     open_set = []
-    heapq.heappush(open_set, (0 + game.heuristic(), 0, game))
+    heapq.heappush(open_set, (game.heuristic(), 0, game))
     
     # Dictionary to keep track of the path
     came_from = {}
@@ -36,8 +36,7 @@ def solve_game_astar(game):
             if type_of_move!="foundation_to_freecell" and type_of_move!="foundation_to_tableau":
                 # Apply the move to get the neighbor state
                 neighbor = current.copy().apply_move(move)
-                neighbor.heuristic()
-                tentative_g_score = current_g + 1
+                tentative_g_score = current_g + 0.001
 
                 # If this path to neighbor is better than any previous one, record it
                 if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
@@ -51,9 +50,49 @@ def solve_game_astar(game):
 
 
 def solve_game_bfs(game):
+    """
+    Attempts to solve the Freecell game using breadth-first search (BFS).
+    It explores the state space level by level without using heuristics.
+    If a solution is found, it reconstructs and returns the path of moves.
+    Otherwise, returns None.
+    """
 
-    print("Unnavailable: BFS under construction.")
+    initial_state = game.copy()
+    queue = deque()
+    queue.append((initial_state, 0))  # Tuple: (state, depth)
+    came_from = {}  # To reconstruct the path: {child_state: (parent_state, move)}
+    visited = set()
+    visited.add(initial_state)
+    
+    while queue:
+        current, depth = queue.popleft()
+        
+        # Debug: Print the current depth and state
+        print(f"Exploring depth {depth}, current state: {current}")
+
+        # Check if we've reached the solved state.
+        if current.is_solved():
+            print("Solution found!")
+            return reconstruct_path(came_from, current)
+        
+        # Iterate over all possible moves from the current state.
+        for move in current.get_possible_moves():
+            type_of_move = move.move_type
+            if type_of_move != "foundation_to_freecell" and type_of_move != "foundation_to_tableau":
+                neighbor = current.copy()
+                neighbor.apply_move(move)
+                
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    came_from[neighbor] = (current, move)
+                    queue.append((neighbor, depth + 1))
+                    # Debug: Print the move and new state
+                    print(f"Move applied: {move}, new state: {neighbor}")
+    
+    # If no solution was found
+    print("No solution found.")
     return None
+
 
 def solve_game_dfs(game):
 
@@ -71,4 +110,13 @@ def reconstruct_path(came_from, current):
         current, move = came_from[current]
         total_path.append(move)
     total_path.reverse()  # Reverse the path to get it from start to goal
+
+    # Print the total path length
+    print(f"{len(total_path)}\n")
+    
+    # Write the total path to a file
+    with open("solution_path.txt", "w") as file:
+        for move in total_path:
+            file.write(f"{move}\n")
+
     return total_path
