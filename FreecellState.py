@@ -162,8 +162,8 @@ class FreecellState:
     def heuristic(self):
         foundation_weight = 1
         fc_weight = 0.25
-        fcol_weight = -0.4
-        blocked_weight = 0.5
+        fcol_weight = -0.2
+        blocked_weight = 0.125
 
         foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
         blocked_free_cells = 0
