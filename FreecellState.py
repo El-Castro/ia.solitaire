@@ -137,9 +137,9 @@ class FreecellState:
     """Calculates a heuristic value for the current FreecellState."""
     # def heuristic(self):
         
-    #     f_weight = 1
-    #     blocking_weight = 0.66
-    #     fc_weight = 1.33
+    #     f_weight = 0.003
+    #     blocking_weight = 0.002
+    #     fc_weight = 0.004
 
     #     foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
     #     blocking_cards = sum(len(col) - 1 for col in self.tableau if col)
