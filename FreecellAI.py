@@ -31,7 +31,7 @@ def solve_game_astar(game):
         for move in current.get_possible_moves_AI():
             # Apply the move to get the neighbor state
             neighbor = current.copy().apply_move(move)
-            tentative_g_score = current_g + 1
+            tentative_g_score = current_g + 0.5
 
             # If this path to neighbor is better than any previous one, record it
             if neighbor not in g_score or tentative_g_score < g_score[neighbor]:

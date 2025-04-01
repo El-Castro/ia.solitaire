@@ -135,23 +135,23 @@ class FreecellState:
 # Heuristic -----------------------------------------------------------------------------------------------------------------------------
 
     """Calculates a heuristic value for the current FreecellState."""
-    def heuristic(self):
+    # def heuristic(self):
         
-        f_weight = 1
-        blocking_weight = 0.66
-        fc_weight = 1.33
+    #     f_weight = 1
+    #     blocking_weight = 0.66
+    #     fc_weight = 1.33
 
-        foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
-        blocking_cards = sum(len(col) - 1 for col in self.tableau if col)
-        blocked_free_cells = sum(1 for cell in self.free_cells if cell)
-        #free_columns = sum(1 for col in self.tableau if not col)
+    #     foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
+    #     blocking_cards = sum(len(col) - 1 for col in self.tableau if col)
+    #     blocked_free_cells = sum(1 for cell in self.free_cells if cell)
+    #     #free_columns = sum(1 for col in self.tableau if not col)
         
-        # Adjust weights based on experimentation
-        score = f_weight * foundation_score + blocking_weight * blocking_cards + fc_weight * blocked_free_cells #- 3 * free_columns
-        print(f"Foundation: {f_weight * foundation_score}, Blocked: {blocking_weight * blocking_cards}, Free Cells: {fc_weight * blocked_free_cells}  ")# Free Columns: {-2 * free_columns}
-        print(f"Total: {score}\n")
+    #     # Adjust weights based on experimentation
+    #     score = f_weight * foundation_score + blocking_weight * blocking_cards + fc_weight * blocked_free_cells #- 3 * free_columns
+    #     print(f"Foundation: {f_weight * foundation_score}, Blocked: {blocking_weight * blocking_cards}, Free Cells: {fc_weight * blocked_free_cells}  ")# Free Columns: {-2 * free_columns}
+    #     print(f"Total: {score}\n")
         
-        return score
+    #     return score
 
 
     #Efficiency improvement attempt (in progress)
