@@ -57,7 +57,7 @@ def get_possible_moves_Astar(state):
     # print("---------------------------------------")
     return moves
 
-def get_possible_moves(state, AImode):
+def get_possible_moves(state, AImode=False):
     """Get all possible moves from the state"""
     moves = []
     for i, column in enumerate(state.tableau):

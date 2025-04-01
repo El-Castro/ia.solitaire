@@ -30,7 +30,7 @@ def solve_game_astar(game):
             return reconstruct_path(came_from, current)
 
         # Iterate through the possible moves from the current state
-        for move in current.get_possible_moves():
+        for move in current.get_possible_moves(True):
             type_of_move=move.move_type
             if type_of_move!="foundation_to_freecell" and type_of_move!="foundation_to_tableau":
                 # Apply the move to get the neighbor state
