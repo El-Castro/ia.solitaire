@@ -35,7 +35,7 @@ def solve_game_astar(game):
             type_of_move=move.move_type
             if type_of_move!="foundation_to_freecell" and type_of_move!="foundation_to_tableau":
                 # Apply the move to get the neighbor state
-                neighbor = current.copy().apply_move_AI(move)
+                neighbor = current.copy().apply_move(move,True)
                 tentative_g_score = current_g + 0.001
 
                 # If this path to neighbor is better than any previous one, record it
@@ -80,7 +80,7 @@ def solve_game_bfs(game):
             type_of_move = move.move_type
             if type_of_move != "foundation_to_freecell" and type_of_move != "foundation_to_tableau":
                 neighbor = current.copy()
-                neighbor.apply_move_AI(move)
+                neighbor.apply_move(move,True)
                 
                 if neighbor not in visited:
                     visited.add(neighbor)
