@@ -2,7 +2,62 @@ from Card import Card
 from Move import Move
 
 
-def get_possible_moves(state,AImode=False):
+def get_possible_moves_Astar(state):
+    """Get all possible moves from the state, avoiding back-and-forth moves."""
+    moves = []
+    
+    last_state = state.history[-1] if state.history else None  # Last state for comparison
+
+    # Moves from tableau to foundation (always a good move)
+    for i, column in enumerate(state.tableau):
+        if column:
+            card = column[-1]
+            if can_move_to_foundation(state, card):
+                moves.append(Move("tableau_to_foundation", i, card.suit))
+
+    # Moves from tableau to freecell (avoid reversing freecell_to_tableau)
+    for i, column in enumerate(state.tableau):
+        if column and can_move_to_freecell(state):
+            if not (last_state and last_state.free_cells.count(None) < state.free_cells.count(None)):  
+                moves.append(Move("tableau_to_freecell", i, None))
+
+    # Moves from tableau to tableau (avoid reversing last tableau_to_tableau move)
+    for i, column in enumerate(state.tableau):
+        if column:
+            for j, target_column in enumerate(state.tableau):
+                if i != j and can_move_to_tableau(state, column[-1], j):
+                    if not (last_state and last_state.tableau[j] and last_state.tableau[j][-1] == column[-1]):
+                        moves.append(Move("tableau_to_tableau", i, j))
+
+    # Moves from freecell to foundation (always a good move)
+    for i, card in enumerate(state.free_cells):
+        if card and can_move_to_foundation(state, card):
+            moves.append(Move("freecell_to_foundation", i, card.suit))
+
+    # Moves from freecell to tableau (avoid reversing tableau_to_freecell)
+    for i, card in enumerate(state.free_cells):
+        if card:
+            for j, column in enumerate(state.tableau):
+                if can_move_to_tableau(state, card, j):
+                    if not (last_state and last_state.tableau[j] and last_state.tableau[j][-1] == card):
+                        moves.append(Move("freecell_to_tableau", i, j))
+
+    # # Moves from foundation to tableau (avoid moving back to foundation immediately)
+    # for suit in state.foundations:
+    #     if state.foundations[suit] > 0:
+    #         for j, column in enumerate(state.tableau):
+    #             card = Card(state.foundations[suit], suit)
+    #             if can_move_to_tableau(state, card, j):
+    #                 if not (last_state and last_state.tableau[j] and last_state.tableau[j][-1] == card):
+    #                     moves.append(Move("foundation_to_tableau", suit, j))
+
+    # print("Valid moves----------------------------")
+    # for i in moves:
+    #     print(i)
+    # print("---------------------------------------")
+    return moves
+
+def get_possible_moves(state, AImode):
     """Get all possible moves from the state"""
     moves = []
     for i, column in enumerate(state.tableau):
@@ -32,24 +87,22 @@ def get_possible_moves(state,AImode=False):
                     moves.append(Move("freecell_to_tableau", i, j))
 
     for suit in state.foundations:
-        if state.foundations[suit] > 0:
+        if state.foundations[suit] > 1:
             for j, column in enumerate(state.tableau):
                 card = Card(state.foundations[suit], suit)
                 if can_move_to_tableau(state, card, j):
                     moves.append(Move("foundation_to_tableau", suit, j))
 
     for suit in state.foundations:
-        if state.foundations[suit] > 0 and can_move_to_freecell(state):
-            for i in range(len(state.free_cells)):
-                if state.free_cells[i] is None:
-                    moves.append(Move("foundation_to_freecell", suit, None))
+        if state.foundations[suit] > 1 and can_move_to_freecell(state):
+            moves.append(Move("foundation_to_freecell", suit, None))
+
     if not AImode:
         print("Valid moves----------------------------")
         for i in moves:
-            print(i.__repr__())
+            print(i)
         print("---------------------------------------")
     return moves
-
 
 # Individual Move Possibility ---------------------------------------------------------------------------------------------------------------
 
@@ -75,7 +128,7 @@ def can_move_to_freecell(state):
 # Individual Move Executioners --------------------------------------------------------------------------------------------------------------------------------
 
 
-def move_tableau_to_foundation(state, col):
+def move_tableau_to_foundation(state, col, AImode=False):
     """
     Move a card from tableau to foundation
     Preconditions:
@@ -93,10 +146,11 @@ def move_tableau_to_foundation(state, col):
             new_state = state.copy()
             new_state.tableau[col].pop()
             new_state.foundations[card.suit] = card.rank
+            if not AImode: print(f"TB-F {card.rank} of {card.suit}\n")
             return new_state
     return None
 
-def move_tableau_to_freecell(state, col):
+def move_tableau_to_freecell(state, col, AImode=False):
     """
     Move a card from tableau to freecell
     Preconditions:
@@ -112,11 +166,12 @@ def move_tableau_to_freecell(state, col):
         for i in range(len(state.free_cells)):
             if state.free_cells[i] is None:  # Find an empty FreeCell
                 new_state = state.copy()
+                if not AImode: print(f"TB{col}-FC {new_state.tableau[col][-1].rank} of {new_state.tableau[col][-1].suit}\n")
                 new_state.free_cells[i] = new_state.tableau[col].pop()  # Modify the copied state
                 return new_state
     return None
 
-def move_freecell_to_foundation(state, fc):
+def move_freecell_to_foundation(state, fc, AImode=False):
     """
     Move a card from freecell to foundation
     Preconditions:
@@ -134,10 +189,11 @@ def move_freecell_to_foundation(state, fc):
             new_state = state.copy()
             new_state.free_cells[fc] = None
             new_state.foundations[card.suit] = card.rank
+            if not AImode: print(f"FC-F {card.rank} of {card.suit}\n")
             return new_state
     return None
 
-def move_tableau_to_tableau(state, src, dest):
+def move_tableau_to_tableau(state, src, dest, AImode=False):
     """
     Move a card from one tableau column to another
     Preconditions:
@@ -154,10 +210,11 @@ def move_tableau_to_tableau(state, src, dest):
         if can_move_to_tableau(state, card, dest):
             new_state = state.copy()
             new_state.tableau[dest].append(new_state.tableau[src].pop())
+            if not AImode: print(f"TB{src}-TB{dest} {card.rank} of {card.suit}\n")
             return new_state
     return None
 
-def move_freecell_to_tableau(state, fc, col):
+def move_freecell_to_tableau(state, fc, col, AImode=False):
     """
     Move a card from freecell to tableau
     Preconditions:
@@ -175,6 +232,7 @@ def move_freecell_to_tableau(state, fc, col):
             new_state = state.copy()
             new_state.tableau[col].append(card)
             new_state.free_cells[fc] = None
+            if not AImode: print(f"FC-TB{col} {card.rank} of {card.suit}\n")
             return new_state
     return None
 
@@ -196,6 +254,7 @@ def move_foundation_to_tableau(state, suit, col):
             new_state = state.copy()
             new_state.foundations[suit] -= 1
             new_state.tableau[col].append(card)
+            print(f"F-TB {card.rank} of {card.suit}\n")
             return new_state
     return None
 
@@ -214,8 +273,10 @@ def move_foundation_to_freecell(state, suit):
     if suit in state.foundations and state.foundations[suit] > 0:
         for i in range(len(state.free_cells)):
             if state.free_cells[i] is None:
+                new_card=Card(state.foundations[suit], suit)
                 new_state = state.copy()
-                new_state.free_cells[i] = Card(state.foundations[suit], suit)
+                new_state.free_cells[i] = new_card
                 new_state.foundations[suit] -= 1
+                print(f"{new_card.rank} of {new_card.suit}\n")
                 return new_state
     return None

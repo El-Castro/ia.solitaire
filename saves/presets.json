@@ -45,5 +45,19 @@
         ],
         "free_cells": [null, null, null, null],
         "foundations": {"hearts": 0, "diamonds": 0, "clubs": 0, "spades": 0}
+    },
+
+    {
+        "name": "nearly solved",
+        "tableau": [
+            [{"rank": 13, "suit": "hearts"}, {"rank": 12, "suit": "clubs"}, {"rank": 11, "suit": "hearts"}, {"rank": 10, "suit": "clubs"}, {"rank": 9, "suit": "hearts"}, {"rank": 8, "suit": "clubs"}, {"rank": 7, "suit": "hearts"}, {"rank": 6, "suit": "clubs"}], [{"rank": 13, "suit": "clubs"}, {"rank": 12, "suit": "hearts"}, {"rank": 11, "suit": "clubs"}, {"rank": 10, "suit": "hearts"}, {"rank": 9, "suit": "clubs"}, {"rank": 8, "suit": "hearts"}, {"rank": 7, "suit": "clubs"}, {"rank": 6, "suit": "hearts"}],
+            [],
+            [],
+            [],
+            [],
+            [],
+            []],
+            "free_cells": [null, null, null, null],
+            "foundations": {"hearts": 5, "diamonds": 13, "clubs": 5, "spades": 13}
     }
 ]

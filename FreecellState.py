@@ -1,3 +1,4 @@
+import copy
 from Card import Card
 from Move import Move
 import FreecellMove as fcm
@@ -16,7 +17,7 @@ class FreecellState:
 
     def copy(self):
         """Creates a deep copy of the current FreecellState instance."""
-        return FreecellState([col[:] for col in self.tableau], self.free_cells[:], self.foundations.copy())
+        return FreecellState(copy.deepcopy(self.tableau), self.free_cells[:], self.foundations.copy())
     
     def is_solved(self):
         """Checks if the current FreecellState is in a solved state."""
@@ -29,6 +30,7 @@ class FreecellState:
             self.tableau = previous_state.tableau
             self.free_cells = previous_state.free_cells
             self.foundations = previous_state.foundations
+        self.heuristic()
         return self
 
 
@@ -103,15 +105,15 @@ class FreecellState:
         move_type = move.move_type
         new_state = None
         if move_type == "tableau_to_foundation":
-            new_state = fcm.move_tableau_to_foundation(self, move.source)
+            new_state = fcm.move_tableau_to_foundation(self, move.source, AImode)
         elif move_type == "tableau_to_freecell":
-            new_state = fcm.move_tableau_to_freecell(self, move.source)
+            new_state = fcm.move_tableau_to_freecell(self, move.source, AImode)
         elif move_type == "freecell_to_foundation":
-            new_state = fcm.move_freecell_to_foundation(self, move.source)
+            new_state = fcm.move_freecell_to_foundation(self, move.source, AImode)
         elif move_type == "tableau_to_tableau":
-            new_state = fcm.move_tableau_to_tableau(self, move.source, move.destination)
+            new_state = fcm.move_tableau_to_tableau(self, move.source, move.destination, AImode)
         elif move_type == "freecell_to_tableau":
-            new_state = fcm.move_freecell_to_tableau(self, move.source, move.destination)
+            new_state = fcm.move_freecell_to_tableau(self, move.source, move.destination, AImode)
         elif move_type == "foundation_to_tableau":
             new_state = fcm.move_foundation_to_tableau(self, move.source, move.destination)
         elif move_type == "foundation_to_freecell":
@@ -126,56 +128,77 @@ class FreecellState:
             self.foundations = new_state.foundations
         return self
 
-    def get_possible_moves(self,AImode=False):
+    def get_possible_moves(self, AImode=False):
         """Calls get_possible_moves from FreecellMove."""
-        return fcm.get_possible_moves(self,AImode)
+        return fcm.get_possible_moves(self, AImode)
 
+    def get_possible_moves_Astar(self):
+        """Calls get_possible_moves_AI from FreecellMove."""
+        return fcm.get_possible_moves_Astar(self)
 
 # Heuristic -----------------------------------------------------------------------------------------------------------------------------
 
-
-    def heuristic(self):
-        """Calculates a heuristic value for the current FreecellState."""
-        foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
-        blocking_cards = sum(len(col) - 1 for col in self.tableau if col)
-        free_cells = sum(1 for cell in self.free_cells if cell)
-        
-        print(0.003 * foundation_score + 0.002 * blocking_cards + 0.004 * free_cells)
-
-        # Adjust weights based on experimentation
-        return 0.003 * foundation_score + 0.002 * blocking_cards + 0.004 * free_cells
-
-
-    # Efficiency improvement attempt (in progress)
+    """Calculates a heuristic value for the current FreecellState."""
     # def heuristic(self):
-    #     foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
         
-    #     # Efficient tracking of the next needed card for each suit
-    #     next_needed = {suit: self.foundations[suit] + 1 for suit in self.foundations}
+    #     f_weight = 0.003
+    #     blocking_weight = 0.002
+    #     fc_weight = 0.004
 
-    #     for card in self.free_cells:
-    #         if card:
-    #             suit, rank = card.suit, card.rank
-    #             if suit in next_needed and rank == next_needed[suit]:
-    #                 del next_needed[suit]  # Remove immediately (already accessible)
+    #     foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
+    #     blocking_cards = sum(len(col) - 1 for col in self.tableau if col)
+    #     blocked_free_cells = sum(1 for cell in self.free_cells if cell)
+    #     #free_columns = sum(1 for col in self.tableau if not col)
+        
+    #     # Adjust weights based on experimentation
+    #     score = f_weight * foundation_score + blocking_weight * blocking_cards + fc_weight * blocked_free_cells #- 3 * free_columns
+    #     print(f"Foundation: {f_weight * foundation_score}, Blocked: {blocking_weight * blocking_cards}, Free Cells: {fc_weight * blocked_free_cells}  ")# Free Columns: {-2 * free_columns}
+    #     print(f"Total: {score}\n")
+        
+    #     return score
 
-    #     blocked_next_cards = 0
 
-    #     for col in self.tableau:
-    #         for depth, card in enumerate(col):  # Iterate from top to bottom
-    #             suit, rank = card.suit, card.rank
-    #             if suit in next_needed and rank == next_needed[suit]:  # It's a needed card
-    #                 blocked_next_cards += depth  # Penalize based on how deep it's buried
-    #                 del next_needed[suit]  # Remove suit from tracking
-    #                 if not next_needed:  # Stop once all 4 suits are found
-    #                     break
-    #         if not next_needed:  
-    #             break  # No need to keep searching
+    #Efficiency improvement attempt (in progress)
+    def heuristic(self):
+        foundation_weight = 1
+        fc_weight = 0.25
+        fcol_weight = -0.4
+        blocked_weight = 0.5
 
-    #     free_columns = sum(1 for col in self.tableau if not col)
-    #     free_cells = sum(1 for cell in self.free_cells if cell is None)
+        foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
+        blocked_free_cells = 0
+        free_columns = 0
+        blocked_next_cards = 0
+        
+        # Efficient tracking of the next needed card for each suit
+        next_needed = {suit: self.foundations[suit] + 1 for suit in self.foundations if self.foundations[suit] < 13}
+        found_suits = set()
 
-    #     return 3 * foundation_score + 2 * blocked_next_cards - 3 * free_cells - 4 * free_columns
+        for card in self.free_cells:
+            if card:
+                blocked_free_cells += 1
+                suit, rank = card.suit, card.rank
+                if suit in next_needed and rank == next_needed[suit]:
+                    found_suits.add(suit)
+
+        for col in self.tableau:
+            if not col:  # Count all open columns
+                free_columns += 1
+                continue
+            if len(found_suits) == len(next_needed): continue # If column not empty but all suits are found, skip
+            for depth, card in enumerate(col):  # If there are cards to find, investigate the column
+                suit, rank = card.suit, card.rank
+                if suit in found_suits: continue    # Skip card if suit is already found
+                if suit in next_needed and rank == next_needed[suit]:  # It's a needed card
+                    blocked_next_cards += (len(col) - depth) # Penalize based on how deep it's buried
+                    found_suits.add(suit)  # Add suit to found suits
+                    if len(found_suits) == len(next_needed): break # Stop if all needed suits were found
+                
+
+        score = foundation_weight * foundation_score + blocked_weight * blocked_next_cards + fc_weight * blocked_free_cells - fcol_weight * free_columns
+
+        print(f"Foundation: {foundation_weight * foundation_score}, Blocked: {blocked_weight * blocked_next_cards}, Free Cells: {fc_weight * blocked_free_cells}, Free Columns: {fcol_weight * free_columns}, Total: {score}\n")
+        return score
 
 
 # Dunder Methods -----------------------------------------------------------------------------------------------------------------------------
