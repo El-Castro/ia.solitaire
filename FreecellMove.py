@@ -2,7 +2,7 @@ from Card import Card
 from Move import Move
 
 
-def get_possible_moves(state):
+def get_possible_moves(state,AImode=False):
     """Get all possible moves from the state"""
     moves = []
     for i, column in enumerate(state.tableau):
@@ -43,11 +43,11 @@ def get_possible_moves(state):
             for i in range(len(state.free_cells)):
                 if state.free_cells[i] is None:
                     moves.append(Move("foundation_to_freecell", suit, None))
-
-    print("Valid moves----------------------------")
-    for i in moves:
-        print(i.__repr__())
-    print("---------------------------------------")
+    if not AImode:
+        print("Valid moves----------------------------")
+        for i in moves:
+            print(i.__repr__())
+        print("---------------------------------------")
     return moves
 
 

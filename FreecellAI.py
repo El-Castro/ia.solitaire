@@ -68,7 +68,7 @@ def solve_game_bfs(game):
         current, depth = queue.popleft()
         
         # Debug: Print the current depth and state
-        print(f"Exploring depth {depth}, current state: {current}")
+        print(f"{depth}")
 
         # Check if we've reached the solved state.
         if current.is_solved():
@@ -76,7 +76,7 @@ def solve_game_bfs(game):
             return reconstruct_path(came_from, current)
         
         # Iterate over all possible moves from the current state.
-        for move in current.get_possible_moves():
+        for move in current.get_possible_moves(True):
             type_of_move = move.move_type
             if type_of_move != "foundation_to_freecell" and type_of_move != "foundation_to_tableau":
                 neighbor = current.copy()
@@ -87,7 +87,6 @@ def solve_game_bfs(game):
                     came_from[neighbor] = (current, move)
                     queue.append((neighbor, depth + 1))
                     # Debug: Print the move and new state
-                    print(f"Move applied: {move}, new state: {neighbor}")
     
     # If no solution was found
     print("No solution found.")
