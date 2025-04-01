@@ -96,41 +96,41 @@ class FreecellState:
 
 # Move Executioner -----------------------------------------------------------------------------------------------------------------------------
 
-
-    def apply_move(self, move):
+    def apply_move(self, move, AImode=False):
         """Applies a given move to the current FreecellState, creating the new state."""
         #print("Apply move: " + move.__repr__())
         move_type = move.move_type
         new_state = None
         if move_type == "tableau_to_foundation":
-            new_state = fcm.move_tableau_to_foundation(self, move.source)
+            new_state = fcm.move_tableau_to_foundation(self, move.source, AImode)
         elif move_type == "tableau_to_freecell":
-            new_state = fcm.move_tableau_to_freecell(self, move.source)
+            new_state = fcm.move_tableau_to_freecell(self, move.source, AImode)
         elif move_type == "freecell_to_foundation":
-            new_state = fcm.move_freecell_to_foundation(self, move.source)
+            new_state = fcm.move_freecell_to_foundation(self, move.source, AImode)
         elif move_type == "tableau_to_tableau":
-            new_state = fcm.move_tableau_to_tableau(self, move.source, move.destination)
+            new_state = fcm.move_tableau_to_tableau(self, move.source, move.destination, AImode)
         elif move_type == "freecell_to_tableau":
-            new_state = fcm.move_freecell_to_tableau(self, move.source, move.destination)
+            new_state = fcm.move_freecell_to_tableau(self, move.source, move.destination, AImode)
         elif move_type == "foundation_to_tableau":
             new_state = fcm.move_foundation_to_tableau(self, move.source, move.destination)
         elif move_type == "foundation_to_freecell":
             new_state = fcm.move_foundation_to_freecell(self, move.source)
         
         if new_state:
-            self.save_state()  # Save current state before applying the move
+            if not AImode:
+                self.save_state()  # Save current state before applying the move
             self.tableau = new_state.tableau
             self.free_cells = new_state.free_cells
             self.foundations = new_state.foundations
         return self
 
-    def get_possible_moves(self):
+    def get_possible_moves(self, AImode=False):
         """Calls get_possible_moves from FreecellMove."""
-        return fcm.get_possible_moves(self)
+        return fcm.get_possible_moves(self, AImode)
 
-    def get_possible_moves_AI(self):
+    def get_possible_moves_Astar(self):
         """Calls get_possible_moves_AI from FreecellMove."""
-        return fcm.get_possible_moves_AI(self)
+        return fcm.get_possible_moves_Astar(self)
 
 # Heuristic -----------------------------------------------------------------------------------------------------------------------------
 

@@ -1,3 +1,4 @@
+from collections import deque
 import heapq
 
 def solve_game_astar(game):
@@ -20,6 +21,7 @@ def solve_game_astar(game):
     f_score = {game: game.heuristic()}
 
     while open_set:
+        print(f"Open set size: {len(open_set)}")
         # Get the node in open_set with the lowest f_score
         _, current_g, current = heapq.heappop(open_set)
 
@@ -28,7 +30,7 @@ def solve_game_astar(game):
             return reconstruct_path(came_from, current)
 
         # Iterate through the possible moves from the current state
-        for move in current.get_possible_moves_AI():
+        for move in current.get_possible_moves_Astar():
             # Apply the move to get the neighbor state
             neighbor = current.copy().apply_move(move)
             tentative_g_score = current_g + 0.5

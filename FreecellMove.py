@@ -2,7 +2,7 @@ from Card import Card
 from Move import Move
 
 
-def get_possible_moves_AI(state):
+def get_possible_moves_Astar(state):
     """Get all possible moves from the state, avoiding back-and-forth moves."""
     moves = []
     
@@ -51,13 +51,13 @@ def get_possible_moves_AI(state):
     #                 if not (last_state and last_state.tableau[j] and last_state.tableau[j][-1] == card):
     #                     moves.append(Move("foundation_to_tableau", suit, j))
 
-    print("Valid moves----------------------------")
-    for i in moves:
-        print(i)
-    print("---------------------------------------")
+    # print("Valid moves----------------------------")
+    # for i in moves:
+    #     print(i)
+    # print("---------------------------------------")
     return moves
 
-def get_possible_moves(state):
+def get_possible_moves(state, AImode):
     """Get all possible moves from the state"""
     moves = []
     for i, column in enumerate(state.tableau):
@@ -97,10 +97,11 @@ def get_possible_moves(state):
         if state.foundations[suit] > 1 and can_move_to_freecell(state):
             moves.append(Move("foundation_to_freecell", suit, None))
 
-    print("Valid moves----------------------------")
-    for i in moves:
-        print(i)
-    print("---------------------------------------")
+    if not AImode:
+        print("Valid moves----------------------------")
+        for i in moves:
+            print(i)
+        print("---------------------------------------")
     return moves
 
 # Individual Move Possibility ---------------------------------------------------------------------------------------------------------------
@@ -127,7 +128,7 @@ def can_move_to_freecell(state):
 # Individual Move Executioners --------------------------------------------------------------------------------------------------------------------------------
 
 
-def move_tableau_to_foundation(state, col):
+def move_tableau_to_foundation(state, col, AImode=False):
     """Move a card from tableau to foundation"""
     if state.tableau[col]:  # Ensure column is not empty
         card = state.tableau[col][-1]
@@ -135,22 +136,22 @@ def move_tableau_to_foundation(state, col):
             new_state = state.copy()
             new_state.tableau[col].pop()
             new_state.foundations[card.suit] = card.rank
-            print(f"TB-F {card.rank} of {card.suit}\n")
+            if not AImode: print(f"TB-F {card.rank} of {card.suit}\n")
             return new_state
     return None
 
-def move_tableau_to_freecell(state, col):
+def move_tableau_to_freecell(state, col, AImode=False):
     """Move a card from tableau to freecell"""
     if state.tableau[col]:  # Ensure column is not empty
         for i in range(len(state.free_cells)):
             if state.free_cells[i] is None:  # Find an empty FreeCell
                 new_state = state.copy()
-                print(f"TB{col}-FC {new_state.tableau[col][-1].rank} of {new_state.tableau[col][-1].suit}\n")
+                if not AImode: print(f"TB{col}-FC {new_state.tableau[col][-1].rank} of {new_state.tableau[col][-1].suit}\n")
                 new_state.free_cells[i] = new_state.tableau[col].pop()  # Modify the copied state
                 return new_state
     return None
 
-def move_freecell_to_foundation(state, fc):
+def move_freecell_to_foundation(state, fc, AImode=False):
     """Move a card from freecell to foundation"""
     if state.free_cells[fc] is not None:
         card = state.free_cells[fc]
@@ -158,22 +159,22 @@ def move_freecell_to_foundation(state, fc):
             new_state = state.copy()
             new_state.free_cells[fc] = None
             new_state.foundations[card.suit] = card.rank
-            print(f"FC-F {card.rank} of {card.suit}\n")
+            if not AImode: print(f"FC-F {card.rank} of {card.suit}\n")
             return new_state
     return None
 
-def move_tableau_to_tableau(state, src, dest):
+def move_tableau_to_tableau(state, src, dest, AImode=False):
     """Move a card from one tableau column to another"""
     if state.tableau[src]:  # Ensure source is not empty
         card = state.tableau[src][-1]
         if can_move_to_tableau(state, card, dest):
             new_state = state.copy()
             new_state.tableau[dest].append(new_state.tableau[src].pop())
-            print(f"TB{src}-TB{dest} {card.rank} of {card.suit}\n")
+            if not AImode: print(f"TB{src}-TB{dest} {card.rank} of {card.suit}\n")
             return new_state
     return None
 
-def move_freecell_to_tableau(state, fc, col):
+def move_freecell_to_tableau(state, fc, col, AImode=False):
     """Move a card from freecell to tableau"""
     if state.free_cells[fc] is not None:
         card = state.free_cells[fc]
@@ -181,7 +182,7 @@ def move_freecell_to_tableau(state, fc, col):
             new_state = state.copy()
             new_state.tableau[col].append(card)
             new_state.free_cells[fc] = None
-            print(f"FC-TB{col} {card.rank} of {card.suit}\n")
+            if not AImode: print(f"FC-TB{col} {card.rank} of {card.suit}\n")
             return new_state
     return None
 

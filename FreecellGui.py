@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 import FreecellMove
 from Card import Card
 from Move import Move
-from FreecellAI import solve_game_astar
+from FreecellAI import solve_game_astar, solve_game_bfs
 from FreecellState import FreecellState
 
 class FreeCellGUI:
