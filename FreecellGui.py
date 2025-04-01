@@ -8,7 +8,7 @@ from PIL import Image, ImageTk
 import FreecellMove
 from Card import Card
 from Move import Move
-from FreecellAI import solve_game
+from FreecellAI import solve_game_astar
 from FreecellState import FreecellState
 import random
 
@@ -86,9 +86,7 @@ class FreeCellGUI:
             # Schedule the next update after 1000ms (1 second)
             self.timer_after_id = self.root.after(1000, self.update_timer)
 
-
-
-        
+      
     def load_card_image(self, card):
         """Loads and resizes the card image."""
         card_name = f"{card.rank}_of_{card.suit}.png"  # Ensure image filenames match this format
@@ -166,6 +164,12 @@ class FreeCellGUI:
 
         if self.selected != None and self.selected[0] == "freecell" and type == "freecell":
             print("Freecell to Freecell move is irrelevant.")
+            self.selected = None
+            self.remove_highlight()
+        elif self.selected != None and self.selected[0] == "foundation" and type == "foundation":
+            print("Foundation to Foundation move is irrelevant.")
+            self.selected = None
+            self.remove_highlight()
         elif self.selected is None and isCard:
             self.selected = (type, index)
 
@@ -211,7 +215,7 @@ class FreeCellGUI:
 
     def solve_game(self):
         """Solves the game using AI and visualizes the moves."""
-        result = solve_game(self.game)
+        result = solve_game_astar(self.game)
         if result is not None:
             print("Game solved by AI!")
             self.winning_state()  # Call the method to remove buttons and display message
@@ -278,6 +282,7 @@ class FreeCellGUI:
         self.draw_board()
         print("Undo")
     
+
     def hint_move(self):
         #get possible free moves for the current state 
         possible_moves = FreecellState.get_possible_moves(self.game)
