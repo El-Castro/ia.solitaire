@@ -218,6 +218,11 @@ class FreeCellGUI:
         result = solve_game_astar(self.game)
         if result is not None:
             print("Game solved by AI!")
+            for move in result:
+                self.game = self.game.apply_move(move)
+                self.draw_board()
+                self.root.update_idletasks()
+                time.sleep(0.5)  # Add a delay to visualize the moves
             self.winning_state()  # Call the method to remove buttons and display message
         else:
             print("AI could not solve the game.")
