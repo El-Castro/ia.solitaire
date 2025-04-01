@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 import FreecellMove
 from Card import Card
 from Move import Move
-from FreecellAI import solve_game
+from FreecellAI import solve_game_astar
 from FreecellState import FreecellState
 
 class FreeCellGUI:
@@ -201,7 +201,7 @@ class FreeCellGUI:
 
     def solve_game(self):
         """Solves the game using AI and visualizes the moves."""
-        result = solve_game(self.game)
+        result = solve_game_astar(self.game)
         if result is not None:
             print("Game solved by AI!")
             for move in result:

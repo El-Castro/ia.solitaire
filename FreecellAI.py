@@ -1,6 +1,6 @@
 import heapq
 
-def solve_game(game):
+def solve_game_astar(game):
     """This function attempts to solve the Freecell game using the A* search algorithm.
     It initializes the open set with the initial game state and iteratively explores
     the possible moves to find the solution. The heuristic function is used to estimate

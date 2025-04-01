@@ -21,11 +21,6 @@ def get_possible_moves_AI(state):
             if not (last_state and last_state.free_cells.count(None) < state.free_cells.count(None)):  
                 moves.append(Move("tableau_to_freecell", i, None))
 
-    # Moves from freecell to foundation (always a good move)
-    for i, card in enumerate(state.free_cells):
-        if card and can_move_to_foundation(state, card):
-            moves.append(Move("freecell_to_foundation", i, card.suit))
-
     # Moves from tableau to tableau (avoid reversing last tableau_to_tableau move)
     for i, column in enumerate(state.tableau):
         if column:
@@ -33,6 +28,11 @@ def get_possible_moves_AI(state):
                 if i != j and can_move_to_tableau(state, column[-1], j):
                     if not (last_state and last_state.tableau[j] and last_state.tableau[j][-1] == column[-1]):
                         moves.append(Move("tableau_to_tableau", i, j))
+
+    # Moves from freecell to foundation (always a good move)
+    for i, card in enumerate(state.free_cells):
+        if card and can_move_to_foundation(state, card):
+            moves.append(Move("freecell_to_foundation", i, card.suit))
 
     # Moves from freecell to tableau (avoid reversing tableau_to_freecell)
     for i, card in enumerate(state.free_cells):
@@ -42,14 +42,14 @@ def get_possible_moves_AI(state):
                     if not (last_state and last_state.tableau[j] and last_state.tableau[j][-1] == card):
                         moves.append(Move("freecell_to_tableau", i, j))
 
-    # Moves from foundation to tableau (avoid moving back to foundation immediately)
-    for suit in state.foundations:
-        if state.foundations[suit] > 0:
-            for j, column in enumerate(state.tableau):
-                card = Card(state.foundations[suit], suit)
-                if can_move_to_tableau(state, card, j):
-                    if not (last_state and last_state.tableau[j] and last_state.tableau[j][-1] == card):
-                        moves.append(Move("foundation_to_tableau", suit, j))
+    # # Moves from foundation to tableau (avoid moving back to foundation immediately)
+    # for suit in state.foundations:
+    #     if state.foundations[suit] > 0:
+    #         for j, column in enumerate(state.tableau):
+    #             card = Card(state.foundations[suit], suit)
+    #             if can_move_to_tableau(state, card, j):
+    #                 if not (last_state and last_state.tableau[j] and last_state.tableau[j][-1] == card):
+    #                     moves.append(Move("foundation_to_tableau", suit, j))
 
     print("Valid moves----------------------------")
     for i in moves:
@@ -93,9 +93,9 @@ def get_possible_moves(state):
                 if can_move_to_tableau(state, card, j):
                     moves.append(Move("foundation_to_tableau", suit, j))
 
-    # for suit in state.foundations:
-    #     if state.foundations[suit] > 1 and can_move_to_freecell(state):
-    #         moves.append(Move("foundation_to_freecell", suit, None))
+    for suit in state.foundations:
+        if state.foundations[suit] > 1 and can_move_to_freecell(state):
+            moves.append(Move("foundation_to_freecell", suit, None))
 
     print("Valid moves----------------------------")
     for i in moves:

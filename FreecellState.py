@@ -135,27 +135,37 @@ class FreecellState:
 # Heuristic -----------------------------------------------------------------------------------------------------------------------------
 
     """Calculates a heuristic value for the current FreecellState."""
-    # def heuristic(self):
+    def heuristic(self):
         
-    #     foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
-    #     blocking_cards = sum(len(col) - 1 for col in self.tableau if col)
-    #     blocked_free_cells = sum(1 for cell in self.free_cells if cell)
-    #     #free_columns = sum(1 for col in self.tableau if not col)
+        f_weight = 1
+        blocking_weight = 0.66
+        fc_weight = 1.33
+
+        foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
+        blocking_cards = sum(len(col) - 1 for col in self.tableau if col)
+        blocked_free_cells = sum(1 for cell in self.free_cells if cell)
+        #free_columns = sum(1 for col in self.tableau if not col)
         
-    #     # Adjust weights based on experimentation
-    #     score = foundation_score + 0.5 * blocking_cards + 0.5 * blocked_free_cells #- 3 * free_columns
-    #     print(f"Foundation: {foundation_score}, Blocked: {blocking_cards}, Free Cells: {blocked_free_cells}  ")# Free Columns: {-2 * free_columns}
-    #     print(f"Total: {score}\n")
+        # Adjust weights based on experimentation
+        score = f_weight * foundation_score + blocking_weight * blocking_cards + fc_weight * blocked_free_cells #- 3 * free_columns
+        print(f"Foundation: {f_weight * foundation_score}, Blocked: {blocking_weight * blocking_cards}, Free Cells: {fc_weight * blocked_free_cells}  ")# Free Columns: {-2 * free_columns}
+        print(f"Total: {score}\n")
         
-    #     return score
+        return score
 
 
     #Efficiency improvement attempt (in progress)
     def heuristic(self):
+        foundation_weight = 1
+        fc_weight = 0.25
+        fcol_weight = -0.4
+        blocked_weight = 0.5
+
         foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
         blocked_free_cells = 0
         free_columns = 0
         blocked_next_cards = 0
+        
         # Efficient tracking of the next needed card for each suit
         next_needed = {suit: self.foundations[suit] + 1 for suit in self.foundations if self.foundations[suit] < 13}
         found_suits = set()
@@ -181,9 +191,9 @@ class FreecellState:
                     if len(found_suits) == len(next_needed): break # Stop if all needed suits were found
                 
 
-        score = foundation_score + 0.5 * blocked_next_cards + 0.25 * blocked_free_cells - 0.4 * free_columns
+        score = foundation_weight * foundation_score + blocked_weight * blocked_next_cards + fc_weight * blocked_free_cells - fcol_weight * free_columns
 
-        print(f"Foundation: {foundation_score}, Blocked: {0.5 * blocked_next_cards}, Free Cells: {0.25 * blocked_free_cells}, Free Columns: {-0.4 * free_columns}, Total: {score}\n")
+        print(f"Foundation: {foundation_weight * foundation_score}, Blocked: {blocked_weight * blocked_next_cards}, Free Cells: {fc_weight * blocked_free_cells}, Free Columns: {fcol_weight * free_columns}, Total: {score}\n")
         return score
 
 
