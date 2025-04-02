@@ -354,21 +354,21 @@ def move_foundation_to_freecell(state, suit):
 
 
 # def get_possible_supermoves(state):
-    """
-    Get all possible supermoves from the current state.
+#     """
+#     Get all possible supermoves from the current state.
 
-    Returns:
-    - A list of tuples (src, dest, num_cards) representing the source tableau column,
-        destination tableau column, and the number of cards that can be moved.
-    """
-    supermoves = []
+#     Returns:
+#     - A list of tuples (src, dest, num_cards) representing the source tableau column,
+#         destination tableau column, and the number of cards that can be moved.
+#     """
+#     supermoves = []
 
-    for src in range(len(state.tableau)):
-        if state.tableau[src]:  # Ensure source column is not empty
-            for dest in range(len(state.tableau)):
-                if src != dest:  # Avoid moving to the same column
-                    num_cards = can_supermove(state, src, dest)
-                    if num_cards > 0:
-                        supermoves.append((src, dest, num_cards))
+#     for src in range(len(state.tableau)):
+#         if state.tableau[src]:  # Ensure source column is not empty
+#             for dest in range(len(state.tableau)):
+#                 if src != dest:  # Avoid moving to the same column
+#                     num_cards = can_supermove(state, src, dest)
+#                     if num_cards > 0:
+#                         supermoves.append((src, dest, num_cards))
 
-    return supermoves
+#     return supermoves
