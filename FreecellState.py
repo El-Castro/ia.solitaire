@@ -158,12 +158,12 @@ class FreecellState:
     #     return score
 
 
-    #Efficiency improvement attempt (in progress)
+    # Efficiency improvement attempt (in progress)
     def heuristic(self):
         foundation_weight = 1
         fc_weight = 0.25
-        fcol_weight = -0.4
-        blocked_weight = 0.5
+        fcol_weight = -0.5
+        blocked_weight = 0.125
 
         foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
         blocked_free_cells = 0
@@ -195,7 +195,7 @@ class FreecellState:
                     if len(found_suits) == len(next_needed): break # Stop if all needed suits were found
                 
 
-        score = foundation_weight * foundation_score + blocked_weight * blocked_next_cards + fc_weight * blocked_free_cells - fcol_weight * free_columns
+        score = foundation_weight * foundation_score + blocked_weight * blocked_next_cards + fc_weight * blocked_free_cells + fcol_weight * free_columns
 
         print(f"Foundation: {foundation_weight * foundation_score}, Blocked: {blocked_weight * blocked_next_cards}, Free Cells: {fc_weight * blocked_free_cells}, Free Columns: {fcol_weight * free_columns}, Total: {score}\n")
         return score

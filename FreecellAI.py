@@ -1,4 +1,5 @@
 from collections import deque
+import FreecellMove as fcm
 import heapq
 
 def solve_game_astar(game):
@@ -30,12 +31,13 @@ def solve_game_astar(game):
             return reconstruct_path(came_from, current)
 
         # Iterate through the possible moves from the current state
-        for move in current.get_possible_moves(True):
+        for move in current.get_possible_moves_Astar():
             type_of_move=move.move_type
             if type_of_move!="foundation_to_freecell" and type_of_move!="foundation_to_tableau":
                 # Apply the move to get the neighbor state
                 neighbor = current.copy().apply_move(move,True)
-                tentative_g_score = current_g + 0.001
+                fcm.apply_automatic_moves(neighbor)
+                tentative_g_score = current_g + 1# + len(auto_moves)
 
                 # If this path to neighbor is better than any previous one, record it
                 if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
@@ -80,6 +82,7 @@ def solve_game_bfs(game):
             if type_of_move != "foundation_to_freecell" and type_of_move != "foundation_to_tableau":
                 neighbor = current.copy()
                 neighbor.apply_move(move,True)
+                fcm.apply_automatic_moves(neighbor)
                 
                 if neighbor not in visited:
                     visited.add(neighbor)

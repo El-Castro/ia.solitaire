@@ -1,6 +1,58 @@
 from Card import Card
 from Move import Move
 
+def get_automatic_moves(state):
+
+    moves = []
+
+    next_needed = {suit: state.foundations[suit] + 1 for suit in state.foundations if state.foundations[suit] < 13}
+    
+    """Check if an opposite-color card of rank-1 exists in the top 3 depths of any tableau column."""
+    def near_lower(card):
+        if card.rank <= 2:  
+            return False  # A 2 or Ace can never block anything, always move it
+        for col in state.tableau:
+            if col and len(col) > 1:  # Ignore empty columns and single cards
+                for depth in range(min(2, len(col))):  # Check only the top 2 cards
+                    top_card = col[-(depth + 1)]
+                    if top_card.rank == card.rank - 1 and top_card.colour != card.colour:
+                        return True
+        return False
+
+    for i, column in enumerate(state.tableau):
+        if column:
+            card = column[-1]
+            suit, rank = card.suit, card.rank
+
+            if suit in next_needed and rank == next_needed[suit]:  # Can move to foundation
+                #if not near_lower(card):
+                    moves.append(Move("tableau_to_foundation", i, suit))
+
+        # Check Freecells for automatic moves
+    for i, card in enumerate(state.free_cells):
+        if card:
+            suit, rank = card.suit, card.rank
+
+            if suit in next_needed and rank == next_needed[suit]:  # Can move to foundation
+                #if not near_lower(card):
+                    moves.append(Move("freecell_to_foundation", i, suit))
+    
+    #print("Automatic Moves:", [f"{move.move_type} from {move.source}" for move in moves])
+        
+    return moves
+
+
+def apply_automatic_moves(state):
+    """Recursively applies all automatic moves to foundations until no more can be made."""
+    
+    while True:
+        moves = get_automatic_moves(state)
+        if not moves:  # Stop when no more automatic moves are possible
+            break
+        for move in moves:
+            state.apply_move(move)  # Apply each move
+    
+    return state
 
 def get_possible_moves_Astar(state):
     """Get all possible moves from the state, avoiding back-and-forth moves."""

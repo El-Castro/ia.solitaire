@@ -5,7 +5,7 @@ from tkinter import *
 import tkinter.messagebox 
 import tkinter
 from PIL import Image, ImageTk
-import FreecellMove
+import FreecellMove as fcm
 from Card import Card
 from Move import Move
 from FreecellAI import solve_game_astar,solve_game_bfs,solve_game_dfs
@@ -44,6 +44,7 @@ class FreeCellGUI:
         self.setup_buttons()
 
         print(self.game.heuristic())
+        fcm.apply_automatic_moves(self.game)
         self.draw_board()
   
 
@@ -201,9 +202,10 @@ class FreeCellGUI:
             move = Move(move_type, src_index, dest_index)
 
             print(f"Selected move: {move}")
-            possible_moves = FreecellMove.get_possible_moves(self.game)
+            possible_moves = fcm.get_possible_moves(self.game)
             if move in possible_moves:
                 self.game = self.game.apply_move(move)
+                fcm.apply_automatic_moves(self.game)
                 print(self.game.heuristic())
             else: 
                 print("Move not possible")
@@ -219,7 +221,7 @@ class FreeCellGUI:
 
     def solve_game(self):
         """Solves the game using AI and visualizes the moves."""
-        result = solve_game_astar(self.game)
+        result = solve_game_bfs(self.game)
         if result is not None:
             print("Game solved by AI!")
             for move in result:
