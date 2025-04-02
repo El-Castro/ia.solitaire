@@ -8,7 +8,7 @@ from PIL import Image, ImageTk
 import FreecellMove
 from Card import Card
 from Move import Move
-from FreecellAI import solve_game
+from FreecellAI import dfs_solve
 from FreecellState import FreecellState
 import random
 
@@ -211,7 +211,8 @@ class FreeCellGUI:
 
     def solve_game(self):
         """Solves the game using AI and visualizes the moves."""
-        result = solve_game(self.game)
+        #result = solve_game(self.game)
+        result = dfs_solve(self.game)
         if result is not None:
             print("Game solved by AI!")
             self.winning_state()  # Call the method to remove buttons and display message
@@ -220,16 +221,14 @@ class FreeCellGUI:
 
 
     def winning_state(self):
-        """Removes all buttons and displays 'Game is over' message."""
-        # Remove all buttons from the canvas
-        self.canvas.delete("all")
-         # Load the background image (same as game UI)
-        self.bg_image = Image.open("assets/board.jpg")  
-        self.bg_image = self.bg_image.resize((850, 600), Image.LANCZOS)
-        self.bg_photo = ImageTk.PhotoImage(self.bg_image)
-        self.canvas.create_image(0, 0, image=self.bg_photo, anchor="nw")
         # Display a game-over message
-        self.canvas.create_text(425, 300, text="Game Solved", font=("Arial", 36, "bold"), fill="white")
+        #self.canvas.create_text(425, 300, text="Game Solved", font=("Arial", 36, "bold"), fill="white")
+        popup = tk.Tk()
+        popup.wm_title("Winning message")
+        label = tk.Label(popup, text = "GAEM SOLVED")
+        label.pack(side = "top", fill = "x", pady = 10)
+
+
 
 
     def highlight_card(self, x, y):

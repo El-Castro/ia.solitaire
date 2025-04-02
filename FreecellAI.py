@@ -53,3 +53,52 @@ def reconstruct_path(came_from, current):
     total_path.reverse()  # Reverse the path to get it from start to goal
     return total_path
 
+#dfs 
+def dfs_solve(game):
+    """Solves FreeCell using Depth-First Search (DFS)."""
+    
+    stack = [(game, [])]  # Stack stores (current game state, path of moves)
+    visited = set()  # Set to track visited states
+
+    while stack:
+        current, path = stack.pop()  # Get the last added state (LIFO behavior)
+
+        if current.is_solved():
+            return path  # Return the sequence of moves leading to the solution
+
+        # Avoid revisiting already explored game states
+        if current in visited:  # Directly checking if state exists in set
+            continue
+        visited.add(current)  # Mark state as visited
+
+        # Get all possible moves from the current state
+        for move in current.get_possible_moves():
+            new_game = current.copy().apply_move(move)  # Apply the move
+            stack.append((new_game, path + [move]))  # Store new state with updated move history
+
+    return None  # No solution found
+
+"""
+def dfs_solve(game):    
+    # Base case: if the game is solved, return the move history
+    if game.is_solved():
+        return game.history  # Return the sequence of game states
+
+    # Iterate through all possible moves
+    for move in game.get_possible_moves():
+        game.save_state()  # Save current state before applying the move
+        game.apply_move(move)  # Apply the move
+
+        result = dfs_solve(game)  # Recursive call
+
+        if result:  # If a solution is found, return it
+            return result
+        
+        game.undo()  # Backtrack if move didn't lead to a solution
+
+    return None  # No solution found
+
+"""
+
+
+
