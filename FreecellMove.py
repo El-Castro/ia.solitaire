@@ -156,6 +156,7 @@ def get_possible_moves(state, AImode=False):
         print("---------------------------------------")
     return moves
 
+
 # Individual Move Possibility ---------------------------------------------------------------------------------------------------------------
 
 
@@ -332,3 +333,94 @@ def move_foundation_to_freecell(state, suit):
                 print(f"{new_card.rank} of {new_card.suit}\n")
                 return new_state
     return None
+
+
+# Special Move Executioners --------------------------------------------------------------------------------------------------------------------------------
+
+
+# def can_supermove(state, src, dest):
+#     """
+#     Checks if a supermove can be performed from one tableau column to another.
+#     Ensures the cards are together, have alternating colors, and are in decreasing rank.
+#     Returns the number of cards that can be moved if the supermove is valid, otherwise returns 0.
+
+#     Preconditions:
+#     - The source tableau column `src` is not empty.
+#     - The destination tableau column `dest` is valid for the move.
+
+#     Returns:
+#     - The number of cards that can be moved if the supermove is valid, otherwise 0.
+#     """
+#     if not state.tableau[src]:
+#         return 0  # Source column is empty
+
+#     # Calculate the maximum number of cards that can be moved
+#     free_cells = sum(1 for cell in state.free_cells if cell is None)
+#     empty_columns = sum(1 for col in state.tableau if not col and col != state.tableau[dest])
+#     max_cards = (free_cells + 1) * (2 ** empty_columns)
+
+#     # Identify the cards to move
+#     src_column = state.tableau[src]
+#     for num_cards in range(2, min(len(src_column), max_cards) + 1):
+#         cards_to_move = src_column[-num_cards:]
+
+#         # Check if the cards are together, alternating colors, and in decreasing rank
+#         valid_sequence = True
+#         for i in range(len(cards_to_move) - 1):
+#             if (cards_to_move[i].rank != cards_to_move[i + 1].rank + 1 or
+#                 cards_to_move[i].colour == cards_to_move[i + 1].colour):
+#                 valid_sequence = False
+#                 break
+
+#         if valid_sequence and can_move_to_tableau(state, cards_to_move[0], dest):
+#             return num_cards  # Return the number of cards that can be moved
+
+#     return 0  # No valid supermove found
+
+
+# def execute_supermove(state, src, dest, num_cards):
+#     """
+#     Executes a supermove by moving multiple cards from one tableau column to another.
+
+#     Preconditions:
+#     - The source tableau column `src` is not empty.
+#     - The destination tableau column `dest` is valid for the move.
+#     - The number of cards to move `num_cards` is within the allowed limit.
+
+#     Effects:
+#     - Moves multiple cards from the source tableau column to the destination tableau column.
+
+#     Returns:
+#     - A new state with the supermove applied, or None if the move is not possible.
+#     """
+#     if num_cards <= 0 or not state.tableau[src]:
+#         return None  # Invalid number of cards or empty source column
+
+#     # Check if the move is valid
+#     new_state = state.copy()
+#     new_state.tableau[dest].extend(new_state.tableau[src][-num_cards:])
+#     del new_state.tableau[src][-num_cards:]
+#     print(f"S {src} {dest} {num_cards}")
+
+#     return new_state
+
+
+# def get_possible_supermoves(state):
+#     """
+#     Get all possible supermoves from the current state.
+
+#     Returns:
+#     - A list of tuples (src, dest, num_cards) representing the source tableau column,
+#         destination tableau column, and the number of cards that can be moved.
+#     """
+#     supermoves = []
+
+#     for src in range(len(state.tableau)):
+#         if state.tableau[src]:  # Ensure source column is not empty
+#             for dest in range(len(state.tableau)):
+#                 if src != dest:  # Avoid moving to the same column
+#                     num_cards = can_supermove(state, src, dest)
+#                     if num_cards > 0:
+#                         supermoves.append((src, dest, num_cards))
+
+#     return supermoves
