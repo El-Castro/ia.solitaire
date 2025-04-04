@@ -2,6 +2,10 @@ from collections import deque
 import FreecellMove as fcm
 import heapq
 
+
+# A Star ------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 def solve_game_astar(game):
     """This function attempts to solve the Freecell game using the A* search algorithm.
     It initializes the open set with the initial game state and iteratively explores
@@ -50,6 +54,9 @@ def solve_game_astar(game):
     return None
 
 
+# BFS ---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 def solve_game_bfs(game):
     """
     Attempts to solve the Freecell game using breadth-first search (BFS).
@@ -95,13 +102,16 @@ def solve_game_bfs(game):
     return None
 
 
+# DFS ---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 def solve_game_dfs(game):
 
     print("Unnavailable: DFS under construction.")
     return None
 
 
-# Auxiliary functions -----------------------------------------------------------------------------------------------------------------------------
+# Auxiliary functions -----------------------------------------------------------------------------------------------------------------------------------------
 
 
 def reconstruct_path(came_from, current):

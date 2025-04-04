@@ -6,6 +6,7 @@ import random
 import os
 import json
 
+
 class FreecellState:
     def __init__(self, tableau, free_cells=None, foundations=None,minutes = None, seconds = None):
         self.tableau = tableau  # 8 tableau columns
@@ -18,11 +19,11 @@ class FreecellState:
     def copy(self):
         """Creates a deep copy of the current FreecellState instance."""
         return FreecellState([col[:] for col in self.tableau], self.free_cells[:], self.foundations.copy())
-    
+
     def is_solved(self):
         """Checks if the current FreecellState is in a solved state."""
         return all(self.foundations[suit] == 13 for suit in self.foundations)
-    
+
     def undo(self):
         """Reverts the FreecellState to the previous state if there is any history."""
         if self.history:
@@ -121,7 +122,7 @@ class FreecellState:
         
         if new_state:
             if not AImode:
-                print("Apply move: " + move.__repr__())
+                #print("Apply move: " + move.__repr__())
                 self.save_state()  # Save current state before applying the move
             self.tableau = new_state.tableau
             self.free_cells = new_state.free_cells
@@ -136,9 +137,11 @@ class FreecellState:
         """Calls get_possible_moves_AI from FreecellMove."""
         return fcm.get_possible_moves_Astar(self)
 
+
 # Heuristic -----------------------------------------------------------------------------------------------------------------------------
 
     """Calculates a heuristic value for the current FreecellState."""
+
     def heuristic(self):
         foundation_weight = 0.5
         fc_weight = 0.3
