@@ -132,8 +132,8 @@ from concurrent.futures import ProcessPoolExecutor, TimeoutError
 # Helper: float range generator.
 def frange(start, stop, step):
     x = start
-    while x <= stop:
-        yield x
+    while x <= stop + 1e-9:  # tiny epsilon to handle precision edge
+        yield round(x, 2)
         x += step
 
 # This function assumes that you have modified your game state or heuristic to accept weights.
@@ -177,9 +177,17 @@ def grid_search(game, weight_ranges, timeout=10):
                 result = future.result(timeout=timeout)
                 results.append(result)
                 print("Tested combo:", result)
+                cost = result[4]
+                time_elapsed = result[5]
                 # result is a tuple: (foundation_weight, fc_weight, fcol_weight, blocked_weight, cost, elapsed)
-                if best is None or result[4] < best:
-                    best = result[4]
+                if best is None or cost < best:
+                    best = cost
+                    best_time = time_elapsed
+                    best_combo = result[:4]
+
+                # Tie on cost — check for faster time
+                elif cost == best and time_elapsed < best_time:
+                    best_time = time_elapsed
                     best_combo = result[:4]
             except TimeoutError:
                 print("Timeout for combination", futures[future])
@@ -187,13 +195,3 @@ def grid_search(game, weight_ranges, timeout=10):
                 print("Error for combination", futures[future], ":", e)
     
     return best_combo, best, results
-
-# Example weight ranges (you can adjust these as needed):
-weight_ranges = {
-    'foundation': (0.5, 1.5, 0.25),  # e.g., 0.5, 0.75, 1.0, 1.25, 1.5
-    'fc': (0.1, 0.5, 0.1),           # e.g., 0.1, 0.2, 0.3, 0.4, 0.5
-    'fcol': (-2, -0.5, 0.5),         # e.g., -2.0, -1.5, -1.0, -0.5
-    'blocked': (0.1, 0.3, 0.05)       # e.g., 0.1, 0.15, 0.2, 0.25, 0.3
-}
-
-
