@@ -152,33 +152,12 @@ class FreecellState:
 
 # Heuristic -----------------------------------------------------------------------------------------------------------------------------
 
-    """Calculates a heuristic value for the current FreecellState."""
-    # def heuristic(self):
-        
-    #     f_weight = 0.003
-    #     blocking_weight = 0.002
-    #     fc_weight = 0.004
-
-    #     foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
-    #     blocking_cards = sum(len(col) - 1 for col in self.tableau if col)
-    #     blocked_free_cells = sum(1 for cell in self.free_cells if cell)
-    #     #free_columns = sum(1 for col in self.tableau if not col)
-        
-    #     # Adjust weights based on experimentation
-    #     score = f_weight * foundation_score + blocking_weight * blocking_cards + fc_weight * blocked_free_cells #- 3 * free_columns
-    #     print(f"Foundation: {f_weight * foundation_score}, Blocked: {blocking_weight * blocking_cards}, Free Cells: {fc_weight * blocked_free_cells}  ")# Free Columns: {-2 * free_columns}
-    #     print(f"Total: {score}\n")
-        
-    #     return score
-
-
-    # Efficiency improvement attempt (in progress)
     def heuristic(self):
         w = HEURISTIC_WEIGHTS
         # foundation_weight = 0.5
-        # fc_weight = 0.3
-        # fcol_weight = -0
-        # blocked_weight = 0.33
+        # fc_weight = 0.25
+        # fcol_weight = -0.5
+        # blocked_weight = 0.4
 
         foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
         blocked_free_cells = 0
