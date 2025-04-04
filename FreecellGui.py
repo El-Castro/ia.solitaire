@@ -221,11 +221,12 @@ class FreeCellGUI:
 
     def solve_game(self):
         """Solves the game using AI and visualizes the moves."""
-        result = solve_game_bfs(self.game)
+        result = solve_game_astar(self.game)
         if result is not None:
             print("Game solved by AI!")
             for move in result:
                 self.game = self.game.apply_move(move)
+                self.game = fcm.apply_automatic_moves(self.game)
                 self.draw_board()
                 self.root.update_idletasks()
                 time.sleep(0.5)  # Add a delay to visualize the moves
