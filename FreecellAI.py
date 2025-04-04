@@ -35,7 +35,7 @@ def solve_game_astar(game):
             type_of_move=move.move_type
             if type_of_move!="foundation_to_freecell" and type_of_move!="foundation_to_tableau":
                 # Apply the move to get the neighbor state
-                neighbor = current.copy().apply_move(move,True)
+                neighbor = current.copy().apply_move(move)
                 fcm.apply_automatic_moves(neighbor)
                 tentative_g_score = current_g + 1# + len(auto_moves)
 
