@@ -199,7 +199,7 @@ def move_tableau_to_foundation(state, col, AImode=False):
             new_state = state.copy()
             new_state.tableau[col].pop()
             new_state.foundations[card.suit] = card.rank
-            if not AImode: print(f"TB-F {card.rank} of {card.suit}\n")
+            #if not AImode: print(f"TB-F {card.rank} of {card.suit}\n")
             return new_state
     return None
 
@@ -219,7 +219,7 @@ def move_tableau_to_freecell(state, col, AImode=False):
         for i in range(len(state.free_cells)):
             if state.free_cells[i] is None:  # Find an empty FreeCell
                 new_state = state.copy()
-                if not AImode: print(f"TB{col}-FC {new_state.tableau[col][-1].rank} of {new_state.tableau[col][-1].suit}\n")
+                #if not AImode: print(f"TB{col}-FC {new_state.tableau[col][-1].rank} of {new_state.tableau[col][-1].suit}\n")
                 new_state.free_cells[i] = new_state.tableau[col].pop()  # Modify the copied state
                 return new_state
     return None
@@ -242,7 +242,7 @@ def move_freecell_to_foundation(state, fc, AImode=False):
             new_state = state.copy()
             new_state.free_cells[fc] = None
             new_state.foundations[card.suit] = card.rank
-            if not AImode: print(f"FC-F {card.rank} of {card.suit}\n")
+            #if not AImode: print(f"FC-F {card.rank} of {card.suit}\n")
             return new_state
     return None
 
@@ -263,7 +263,7 @@ def move_tableau_to_tableau(state, src, dest, AImode=False):
         if can_move_to_tableau(state, card, dest):
             new_state = state.copy()
             new_state.tableau[dest].append(new_state.tableau[src].pop())
-            if not AImode: print(f"TB{src}-TB{dest} {card.rank} of {card.suit}\n")
+            #if not AImode: print(f"TB{src}-TB{dest} {card.rank} of {card.suit}\n")
             return new_state
     return None
 
@@ -285,7 +285,7 @@ def move_freecell_to_tableau(state, fc, col, AImode=False):
             new_state = state.copy()
             new_state.tableau[col].append(card)
             new_state.free_cells[fc] = None
-            if not AImode: print(f"FC-TB{col} {card.rank} of {card.suit}\n")
+            #if not AImode: print(f"FC-TB{col} {card.rank} of {card.suit}\n")
             return new_state
     return None
 
@@ -307,7 +307,7 @@ def move_foundation_to_tableau(state, suit, col):
             new_state = state.copy()
             new_state.foundations[suit] -= 1
             new_state.tableau[col].append(card)
-            print(f"F-TB {card.rank} of {card.suit}\n")
+            #print(f"F-TB {card.rank} of {card.suit}\n")
             return new_state
     return None
 
@@ -330,7 +330,7 @@ def move_foundation_to_freecell(state, suit):
                 new_state = state.copy()
                 new_state.free_cells[i] = new_card
                 new_state.foundations[suit] -= 1
-                print(f"{new_card.rank} of {new_card.suit}\n")
+                #print(f"{new_card.rank} of {new_card.suit}\n")
                 return new_state
     return None
 

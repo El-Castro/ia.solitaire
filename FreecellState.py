@@ -6,6 +6,13 @@ import random
 import os
 import json
 
+HEURISTIC_WEIGHTS = {
+    'foundation': 1,
+    'fc': 0.25,
+    'fcol': -1,
+    'blocked': 0.20
+}
+
 class FreecellState:
     def __init__(self, tableau, free_cells=None, foundations=None,minutes = None, seconds = None):
         self.tableau = tableau  # 8 tableau columns
@@ -14,6 +21,13 @@ class FreecellState:
         self.history = []
         self.minutes = minutes
         self.seconds = seconds
+    
+    def set_heuristic_weights(self, foundation, fc, fcol, blocked):
+        global HEURISTIC_WEIGHTS
+        HEURISTIC_WEIGHTS['foundation'] = foundation
+        HEURISTIC_WEIGHTS['fc'] = fc
+        HEURISTIC_WEIGHTS['fcol'] = fcol
+        HEURISTIC_WEIGHTS['blocked'] = blocked
 
     def copy(self):
         """Creates a deep copy of the current FreecellState instance."""
@@ -121,7 +135,7 @@ class FreecellState:
         
         if new_state:
             if not AImode:
-                print("Apply move: " + move.__repr__())
+                # print("Apply move: " + move.__repr__())
                 self.save_state()  # Save current state before applying the move
             self.tableau = new_state.tableau
             self.free_cells = new_state.free_cells
@@ -160,10 +174,11 @@ class FreecellState:
 
     # Efficiency improvement attempt (in progress)
     def heuristic(self):
-        foundation_weight = 1
-        fc_weight = 0.25
-        fcol_weight = -1
-        blocked_weight = 0.125
+        w = HEURISTIC_WEIGHTS
+        # foundation_weight = 1
+        # fc_weight = 0.25
+        # fcol_weight = -1
+        # blocked_weight = 0.20
 
         foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
         blocked_free_cells = 0
@@ -195,9 +210,16 @@ class FreecellState:
                     if len(found_suits) == len(next_needed): break # Stop if all needed suits were found
                 
 
-        score = foundation_weight * foundation_score + blocked_weight * blocked_next_cards + fc_weight * blocked_free_cells + fcol_weight * free_columns
-
-        print(f"Foundation: {foundation_weight * foundation_score}, Blocked: {blocked_weight * blocked_next_cards}, Free Cells: {fc_weight * blocked_free_cells}, Free Columns: {fcol_weight * free_columns}, Total: {score}\n")
+        score = (w['foundation'] * foundation_score +
+                 w['blocked'] * blocked_next_cards +
+                 w['fc'] * blocked_free_cells +
+                 w['fcol'] * free_columns)
+        # Optionally, print debug info:
+        # print(f"Foundation: {w['foundation'] * foundation_score}, "
+        #       f"Blocked: {w['blocked'] * blocked_next_cards}, "
+        #       f"Free Cells: {w['fc'] * blocked_free_cells}, "
+        #       f"Free Columns: {w['fcol'] * free_columns}, "
+        #       f"Total: {score}")
         return score
 
 

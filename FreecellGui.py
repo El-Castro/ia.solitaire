@@ -8,7 +8,7 @@ from PIL import Image, ImageTk
 import FreecellMove as fcm
 from Card import Card
 from Move import Move
-from FreecellAI import solve_game_astar,solve_game_bfs,solve_game_dfs
+from FreecellAI import solve_game_astar,solve_game_bfs,solve_game_dfs,grid_search
 from FreecellState import FreecellState
 import random
 
@@ -221,18 +221,27 @@ class FreeCellGUI:
 
     def solve_game(self):
         """Solves the game using AI and visualizes the moves."""
-        result = solve_game_astar(self.game)
-        if result is not None:
-            print("Game solved by AI!")
-            for move in result:
-                self.game = self.game.apply_move(move)
-                self.game = fcm.apply_automatic_moves(self.game)
-                self.draw_board()
-                self.root.update_idletasks()
-                time.sleep(0.5)  # Add a delay to visualize the moves
-            self.winning_state()  # Call the method to remove buttons and display message
-        else:
-            print("AI could not solve the game.")
+        # Example weight ranges (you can adjust these as needed):
+        weight_ranges = {
+            'foundation': (0.5, 1.5, 0.25),  # e.g., 0.5, 0.75, 1.0, 1.25, 1.5
+            'fc': (0.1, 0.5, 0.1),           # e.g., 0.1, 0.2, 0.3, 0.4, 0.5
+            'fcol': (-2, -0.5, 0.5),         # e.g., -2.0, -1.5, -1.0, -0.5
+            'blocked': (0.1, 0.3, 0.05)       # e.g., 0.1, 0.15, 0.2, 0.25, 0.3
+        }
+        best_combo, best_cost, all_results = grid_search(self.game, weight_ranges, timeout=60)
+        print("Best weight combination:", best_combo, "with cost:", best_cost)
+        # result = solve_game_astar(self.game)
+        # if result is not None:
+        #     print("Game solved by AI!")
+        #     for move in result:
+        #         self.game = self.game.apply_move(move)
+        #         self.game = fcm.apply_automatic_moves(self.game)
+        #         self.draw_board()
+        #         self.root.update_idletasks()
+        #         time.sleep(0.5)  # Add a delay to visualize the moves
+        #     self.winning_state()  # Call the method to remove buttons and display message
+        # else:
+        #     print("AI could not solve the game.")
 
 
     def winning_state(self):

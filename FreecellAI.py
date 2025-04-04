@@ -22,7 +22,7 @@ def solve_game_astar(game):
     f_score = {game: game.heuristic()}
 
     while open_set:
-        print(f"Open set size: {len(open_set)}")
+        #print(f"Open set size: {len(open_set)}")
         # Get the node in open_set with the lowest f_score
         _, current_g, current = heapq.heappop(open_set)
 
@@ -113,7 +113,7 @@ def reconstruct_path(came_from, current):
     total_path.reverse()  # Reverse the path to get it from start to goal
 
     # Print the total path length
-    print(f"{len(total_path)}\n")
+    #print(f"{len(total_path)}\n")
     
     # Write the total path to a file
     with open("solution_path.txt", "w") as file:
@@ -121,3 +121,79 @@ def reconstruct_path(came_from, current):
             file.write(f"{move}\n")
 
     return total_path
+
+
+# Test ---------------------------------------------------------------
+
+import itertools
+import time
+from concurrent.futures import ProcessPoolExecutor, TimeoutError
+
+# Helper: float range generator.
+def frange(start, stop, step):
+    x = start
+    while x <= stop:
+        yield x
+        x += step
+
+# This function assumes that you have modified your game state or heuristic to accept weights.
+# For example, your game object might have a method 'set_heuristic_weights' that the heuristic() method uses.
+def run_astar_with_weights(game, foundation_weight, fc_weight, fcol_weight, blocked_weight):
+    # Update heuristic weights on the game state (or on a copy)
+    game.set_heuristic_weights(foundation_weight, fc_weight, fcol_weight, blocked_weight)
+    
+    start_time = time.time()
+    path = solve_game_astar(game)
+    elapsed = time.time() - start_time
+    cost = len(path) if path is not None else float('inf')
+    return (foundation_weight, fc_weight, fcol_weight, blocked_weight, cost, elapsed)
+
+
+def grid_search(game, weight_ranges, timeout=10):
+    """
+    Searches over combinations of heuristic weights.
+    
+    weight_ranges is a dict with keys:
+      'foundation', 'fc', 'fcol', 'blocked'
+    each as a tuple: (start, stop, step)
+    
+    timeout: maximum time (in seconds) allowed per combination.
+    """
+    best = None
+    best_combo = None
+    all_combos = list(itertools.product(
+        frange(*weight_ranges['foundation']),
+        frange(*weight_ranges['fc']),
+        frange(*weight_ranges['fcol']),
+        frange(*weight_ranges['blocked'])
+    ))
+    results = []
+
+    with ProcessPoolExecutor() as executor:
+        # Submit a job for each combination.
+        futures = {executor.submit(run_astar_with_weights, game.copy(), *combo): combo for combo in all_combos}
+        for future in futures:
+            try:
+                result = future.result(timeout=timeout)
+                results.append(result)
+                print("Tested combo:", result)
+                # result is a tuple: (foundation_weight, fc_weight, fcol_weight, blocked_weight, cost, elapsed)
+                if best is None or result[4] < best:
+                    best = result[4]
+                    best_combo = result[:4]
+            except TimeoutError:
+                print("Timeout for combination", futures[future])
+            except Exception as e:
+                print("Error for combination", futures[future], ":", e)
+    
+    return best_combo, best, results
+
+# Example weight ranges (you can adjust these as needed):
+weight_ranges = {
+    'foundation': (0.5, 1.5, 0.25),  # e.g., 0.5, 0.75, 1.0, 1.25, 1.5
+    'fc': (0.1, 0.5, 0.1),           # e.g., 0.1, 0.2, 0.3, 0.4, 0.5
+    'fcol': (-2, -0.5, 0.5),         # e.g., -2.0, -1.5, -1.0, -0.5
+    'blocked': (0.1, 0.3, 0.05)       # e.g., 0.1, 0.15, 0.2, 0.25, 0.3
+}
+
+
