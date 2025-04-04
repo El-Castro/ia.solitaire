@@ -6,6 +6,7 @@ import random
 import os
 import json
 
+
 class FreecellState:
     def __init__(self, tableau, free_cells=None, foundations=None,minutes = None, seconds = None):
         self.tableau = tableau  # 8 tableau columns
@@ -18,11 +19,11 @@ class FreecellState:
     def copy(self):
         """Creates a deep copy of the current FreecellState instance."""
         return FreecellState([col[:] for col in self.tableau], self.free_cells[:], self.foundations.copy())
-    
+
     def is_solved(self):
         """Checks if the current FreecellState is in a solved state."""
         return all(self.foundations[suit] == 13 for suit in self.foundations)
-    
+
     def undo(self):
         """Reverts the FreecellState to the previous state if there is any history."""
         if self.history:
@@ -136,29 +137,10 @@ class FreecellState:
         """Calls get_possible_moves_AI from FreecellMove."""
         return fcm.get_possible_moves_Astar(self)
 
+
 # Heuristic -----------------------------------------------------------------------------------------------------------------------------
 
-    """Calculates a heuristic value for the current FreecellState."""
-    # def heuristic(self):
-        
-    #     f_weight = 0.003
-    #     blocking_weight = 0.002
-    #     fc_weight = 0.004
 
-    #     foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
-    #     blocking_cards = sum(len(col) - 1 for col in self.tableau if col)
-    #     blocked_free_cells = sum(1 for cell in self.free_cells if cell)
-    #     #free_columns = sum(1 for col in self.tableau if not col)
-        
-    #     # Adjust weights based on experimentation
-    #     score = f_weight * foundation_score + blocking_weight * blocking_cards + fc_weight * blocked_free_cells #- 3 * free_columns
-    #     print(f"Foundation: {f_weight * foundation_score}, Blocked: {blocking_weight * blocking_cards}, Free Cells: {fc_weight * blocked_free_cells}  ")# Free Columns: {-2 * free_columns}
-    #     print(f"Total: {score}\n")
-        
-    #     return score
-
-
-    # Efficiency improvement attempt (in progress)
     def heuristic(self):
         foundation_weight = 0.5
         fc_weight = 0.1
