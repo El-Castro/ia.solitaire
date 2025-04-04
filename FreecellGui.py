@@ -206,7 +206,7 @@ class FreeCellGUI:
             if move in possible_moves:
                 self.game = self.game.apply_move(move)
                 fcm.apply_automatic_moves(self.game)
-                print(self.game.heuristic())
+                self.game.heuristic()
             else: 
                 print("Move not possible")
 
@@ -214,7 +214,7 @@ class FreeCellGUI:
             self.selected = None
             self.remove_highlight()
             self.draw_board()
-            print(self.game.heuristic())
+            self.game.heuristic()
 
             if self.game.is_solved() : self.winning_state()
 

@@ -160,10 +160,10 @@ class FreecellState:
 
     # Efficiency improvement attempt (in progress)
     def heuristic(self):
-        foundation_weight = 1
-        fc_weight = 0.25
-        fcol_weight = -1
-        blocked_weight = 0.125
+        foundation_weight = 0.5
+        fc_weight = 0.1
+        fcol_weight = -0.5
+        blocked_weight = 0.1
 
         foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
         blocked_free_cells = 0
@@ -190,7 +190,7 @@ class FreecellState:
                 suit, rank = card.suit, card.rank
                 if suit in found_suits: continue    # Skip card if suit is already found
                 if suit in next_needed and rank == next_needed[suit]:  # It's a needed card
-                    blocked_next_cards += (len(col) - depth) # Penalize based on how deep it's buried
+                    blocked_next_cards += (len(col) - depth)/2 # Penalize based on how deep it's buried
                     found_suits.add(suit)  # Add suit to found suits
                     if len(found_suits) == len(next_needed): break # Stop if all needed suits were found
                 
