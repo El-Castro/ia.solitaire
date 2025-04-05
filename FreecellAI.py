@@ -150,8 +150,38 @@ def solve_game_bfs(game):
 
 
 def solve_game_dfs(game):
+    """
+    Attempts to solve the Freecell game using Depth-First Search (DFS).
+    Explores as deep as possible along each branch before backtracking.
+    """
+    initial_state = game.copy()
+    stack = [(initial_state, 0)]  # Tuple: (state, depth)
+    came_from = {}  # To reconstruct the path: {child_state: (parent_state, move)}
+    visited = set()
+    visited.add(initial_state)
 
-    print("Unnavailable: DFS under construction.")
+    while stack:
+        current, depth = stack.pop()
+
+        # Debug: Print the current depth
+        print(f"{depth}")
+
+        if current.is_solved():
+            print("Solution found!")
+            return reconstruct_path(came_from, current)
+
+        for move in current.get_possible_moves(True):
+            type_of_move = move.move_type
+            if type_of_move != "foundation_to_freecell" and type_of_move != "foundation_to_tableau":
+                neighbor = current.copy()
+                neighbor.apply_move(move, True)
+
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    came_from[neighbor] = (current, move)
+                    stack.append((neighbor, depth + 1))
+    
+    print("No solution found.")
     return None
 
 
