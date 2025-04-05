@@ -102,11 +102,11 @@ class FreecellMenu:
                 btn = Button(self.root, text=preset_name, font=button_font, bg="lightgrey",
                          command=lambda p=preset: self.start_game(p))  
                 # Add button to canvas
-                self.canvas.create_window(90 + padding * 170, 270, window=btn, width=150, height=50)
+                self.canvas.create_window(padding * 150, 270, window=btn, width=130, height=50)
 
             #back button to the menu
             self.back_to_menu = Button(self.root, text="Back to Menu", font=button_font, bg="lightgrey", command=self.back_to_menu)
-            self.canvas.create_window(420, 400, window=self.back_to_menu, width=150, height=50)
+            self.canvas.create_window(440, 400, window=self.back_to_menu, width=150, height=50)
 
         except FileNotFoundError:
             print("Error: presets.json not found!")

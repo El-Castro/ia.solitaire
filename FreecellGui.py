@@ -2,7 +2,7 @@ import time
 import tkinter as tk
 from tkinter import Button, PhotoImage
 from tkinter import *
-import tkinter.messagebox 
+import tkinter.messagebox as messagebox
 import tkinter
 from PIL import Image, ImageTk
 import FreecellMove as fcm
@@ -26,17 +26,15 @@ class FreeCellGUI:
 
 
 # Initialization / Setup Methods ------------------------------------------------------------------------------------------------------------------------------
-
-
     def setup_ui(self):
         """Sets up the user interface for the FreeCell game."""
         self.root.title("FreeCell Solitaire")
-        self.canvas = tk.Canvas(self.root, width=850, height=600)
+        self.canvas = tk.Canvas(self.root, width=950, height=700)
         self.canvas.pack()
 
         # Load the background image
         self.bg_image = Image.open("assets/table.png")  
-        self.bg_image = self.bg_image.resize((850, 600), Image.LANCZOS)
+        self.bg_image = self.bg_image.resize((950, 700), Image.LANCZOS)
         self.bg_photo = ImageTk.PhotoImage(self.bg_image)
         
         # Place the image on the canvas
@@ -52,23 +50,24 @@ class FreeCellGUI:
   
     def setup_buttons(self):
         """Creates and places buttons that remain static."""
-        self.solve_button = Button(self.root, text="Solve Game", command=self.solve_game)
         self.save_button = Button(self.root, text="Save Game", command=self.save_game)
+        self.solve_button = Button(self.root, text="Solve Game", command=self.solve_game)
         self.undo_button = Button(self.root, text="Undo",command=self.undo_move)
         self.hint_button = Button(self.root, text="Hint",command=self.hint_move)
-
+        
         self.start_time = time.time()  # Get the current time
         self.running = True  # Ensure the timer runs
         self.timer_label = tk.Label(self.root, text="Time: 00:00", font=("Arial", 14), bg="green", fg="white")
-        self.canvas.create_window(750, 550, window=self.timer_label, width=100, height=35)
+        self.canvas.create_window(950, 7000, window=self.timer_label, width=100, height=35)
 
         # Place buttons and timer, store their IDs
         self.button_ids = [
-            self.canvas.create_window(130, 550, window=self.solve_button, width=110, height=35),
-            self.canvas.create_window(280, 550, window=self.save_button, width=110, height=35),
-            self.canvas.create_window(430, 550, window=self.undo_button, width=110, height=35),
-            self.canvas.create_window(580, 550, window=self.hint_button, width=110, height=35),
-            self.canvas.create_window(750, 550, window=self.timer_label, width=120, height=35),
+            self.canvas.create_window(200, 570, window=self.save_button, width=110, height=35),
+            self.canvas.create_window(350, 570, window=self.solve_button, width=110, height=35),
+            self.canvas.create_window(500, 570, window=self.undo_button, width=110, height=35),
+            self.canvas.create_window(650, 570, window=self.hint_button, width=110, height=35),
+            self.canvas.create_window(850, 660, window=self.timer_label, width=120, height=35),
+            
         ]
         self.update_timer() 
 
@@ -84,7 +83,9 @@ class FreeCellGUI:
             self.seconds = elapsed_time  % 60
 
             # Update the timer label to reflect the current minutes and seconds
-            self.timer_label.config(text=f"Time: {self.minutes:02}:{self.seconds:02}")
+            # If timer_label still exists, update it
+            if hasattr(self, 'timer_label') and self.timer_label.winfo_exists():
+                self.timer_label.config(text=f"Time: {self.minutes:02}:{self.seconds:02}")
 
             # Schedule the next update after 1000ms (1 second)
             self.timer_after_id = self.root.after(1000, self.update_timer)
@@ -112,7 +113,7 @@ class FreeCellGUI:
 
         # Draw Free Cells
         for i in range(4):
-            x, y = 50 + i * 100, 50
+            x, y = 85 + i * 100, 50
             rect_id = self.canvas.create_rectangle(x, y, x+60, y+90, outline="white", width=2, fill="green")
             
             if self.game.free_cells[i]:
@@ -122,7 +123,7 @@ class FreeCellGUI:
 
         # Draw Foundations
         for i, suit in enumerate(["hearts", "diamonds", "clubs", "spades"]):
-            x, y = 450 + i * 100, 50
+            x, y = 485 + i * 100, 50
             rect_id = self.canvas.create_rectangle(x, y, x+60, y+90, outline="white", width=2, fill="green")
             
             match suit:
@@ -143,7 +144,7 @@ class FreeCellGUI:
 
         # Draw Tableau
         for i, col in enumerate(self.game.tableau):  
-            x, y = 50 + i * 100, 200
+            x, y = 85 + i * 100, 200
             rect_id = self.canvas.create_rectangle(x, y, x+60, y+300, outline="white", width=2, fill="green")
 
             for j, card in enumerate(col):  
@@ -249,35 +250,15 @@ class FreeCellGUI:
         return (0, 0)  # Default value if type is unknown
 
 
-# Game Control Methods ----------------------------------------------------------------------------------------------------------------------------------------
-
-
-    def solve_game(self):
-        """Solves the game using AI and visualizes the moves."""
-        result = solve_game_astar(self.game)
-        if result is not None:
-            print("Game solved by AI!")
-            for move in result:
-                self.game = self.game.apply_move(move)
-                self.game = fcm.apply_automatic_moves(self.game)
-                self.draw_board()
-                self.root.update_idletasks()
-                time.sleep(0.5)  # Add a delay to visualize the moves
-            self.winning_state()  # Call the method to remove buttons and display message
-        else:
-            print("AI could not solve the game.")
+# Game Control Methods ----------------------------------------------------------------------------------------------------------------------------------------        
 
     def winning_state(self):
-        """Removes all buttons and displays 'Game is over' message."""
-        # Remove all buttons from the canvas
-        self.canvas.delete("all")
-         # Load the background image (same as game UI)
-        self.bg_image = Image.open("assets/board.jpg")  
-        self.bg_image = self.bg_image.resize((850, 600), Image.LANCZOS)
-        self.bg_photo = ImageTk.PhotoImage(self.bg_image)
-        self.canvas.create_image(0, 0, image=self.bg_photo, anchor="nw")
-        # Display a game-over message
-        self.canvas.create_text(425, 300, text="Game Solved", font=("Arial", 36, "bold"), fill="white")
+        """Displays a pop-up message saying the game is over."""
+        try:
+            messagebox.showinfo("Game Over", "Game Solved 🎉")
+        except Exception as e:
+            print(f"Error showing messagebox: {e}")
+
 
     def hint_move(self):
         #get possible free moves for the current state 
@@ -327,3 +308,104 @@ class FreeCellGUI:
             self.root.after_cancel(self.timer_after_id)
         FreecellState.save_to_file(self.game, "saved_game.json")
         print("Game saved successfully!")
+    
+    def solve_game(self):
+        self.title_id = self.canvas.create_text(450, 610, text="Choose an algorithm to solve the game", font=("Helvetica", 15), fill="white")
+    
+        self.solve_button_AI = Button(self.root, text="A*", command=self.solve_game_AI)
+        self.solve_button_BFS = Button(self.root, text="BFS", command=self.solve_game_bfs)
+        self.solve_button_DFS = Button(self.root, text="DFS", command=self.solve_game_dfs)
+
+        # Store canvas windows IDs
+        self.solve_button_AI_id = self.canvas.create_window(280, 650, window=self.solve_button_AI, width=110, height=35)
+        self.solve_button_BFS_id = self.canvas.create_window(430, 650, window=self.solve_button_BFS, width=110, height=35)
+        self.solve_button_DFS_id = self.canvas.create_window(580, 650, window=self.solve_button_DFS, width=110, height=35)
+
+                            
+    def solve_game_AI(self):
+        if self.hide_solver_ui():
+            self.root.after(100, self.solve_game_AI_2)
+
+    def solve_game_bfs(self):
+        if self.hide_solver_ui():
+            self.root.after(100, self.solve_game_bfs_2)
+
+    def solve_game_dfs(self):
+        if self.hide_solver_ui():
+            self.root.after(100, self.solve_game_dfs_2)
+
+    def solve_game_AI_2(self):
+        result = solve_game_astar(self.game)
+        if result is not None:
+            for move in result:
+                self.game = self.game.apply_move(move)
+                self.game = fcm.apply_automatic_moves(self.game)
+                self.draw_board()
+                self.root.update_idletasks()
+                time.sleep(0.5)
+            self.winning_state()
+        else:
+            print("AI could not solve the game.")
+
+    def solve_game_bfs_2(self):
+        result = solve_game_bfs(self.game)
+        if result is not None:
+            for move in result:
+                self.game = self.game.apply_move(move)
+                self.game = fcm.apply_automatic_moves(self.game)
+                self.draw_board()
+                self.root.update_idletasks()
+                time.sleep(0.5)
+            self.winning_state()
+        else:
+            print("BFS could not solve the game.")
+
+    def solve_game_dfs_2(self):
+        result = solve_game_dfs(self.game)
+        if result is not None:
+            for move in result:
+                self.game = self.game.apply_move(move)
+                self.game = fcm.apply_automatic_moves(self.game)
+                self.draw_board()
+                self.root.update_idletasks()
+                time.sleep(0.5)
+            self.winning_state()
+        else:
+            print("DFS could not solve the game.")
+
+    
+    def hide_solver_ui(self):
+        """Attempts to remove solver UI buttons and returns True if successful."""
+        try:
+            self.solve_button_AI.destroy()
+            self.solve_button_BFS.destroy()
+            self.solve_button_DFS.destroy()
+
+            self.canvas.delete(self.solve_button_AI_id)
+            self.canvas.delete(self.solve_button_BFS_id)
+            self.canvas.delete(self.solve_button_DFS_id)
+            self.canvas.delete(self.title_id)
+
+            return True  # All deletions succeeded
+        except Exception as e:
+            print(f"Error while hiding solver UI: {e}")
+            return False  # Something went wrong
+        
+    def return_to_main_menu(self):
+        from FreecellMenu import FreecellMenu  # Avoid circular import at top level
+
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        
+        FreecellMenu.setup_menu(self)
+
+        
+
+        
+        
+
+
+
+
+
+
