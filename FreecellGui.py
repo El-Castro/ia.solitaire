@@ -245,7 +245,7 @@ class FreeCellGUI:
             return (450 + foundation_map[index] * 100, 50)
         elif type == "tableau":
             column = self.game.tableau[index]
-            return (50 + index * 100, 200 + (len(column) - 1) * 30)
+            return (85 + index * 100, 200 + (len(column) - 1) * 30)
         return (0, 0)  # Default value if type is unknown
 
 
