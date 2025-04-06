@@ -17,6 +17,7 @@ def solve_game_astar(game):
     the cost of reaching the goal from the current state."""
     start_time = time.time()  # Start timer
     tracemalloc.start()  # Start memory tracking
+    isDone=False
 
     try:
         # Initialize the open set (priority queue) with the initial game state
@@ -39,12 +40,19 @@ def solve_game_astar(game):
 
             # If the current state is the goal, reconstruct and return the path
             if current.is_solved():
+                isDone=True
                 end_time = time.time()  # End timer
                 current_mem, peak_mem = tracemalloc.get_traced_memory()  # Get memory usage
                 tracemalloc.stop()  # Stop memory tracking
 
                 print(f"Solution found in {end_time - start_time:.4f} seconds!")
                 print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
+
+                with open("statistics_astar.txt", "w") as file:
+                    file.write(f"Number of states explored: {len(g_score)}\n")
+                    file.write(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB\n")
+                    file.write(f"Time taken: {end_time - start_time:.4f} seconds\n")
+
                 return reconstruct_path_astar(came_from, current)
 
             # Iterate through the possible moves from the current state
@@ -81,9 +89,10 @@ def solve_game_astar(game):
     except KeyboardInterrupt:
         print("Execution interrupted by user.")
     finally:
-        current_mem, peak_mem = tracemalloc.get_traced_memory()  # Get memory usage
-        tracemalloc.stop()
-        print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
+        if not isDone:
+            current_mem, peak_mem = tracemalloc.get_traced_memory()  # Get memory usage
+            tracemalloc.stop()
+            print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
 
 
 # BFS ---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -98,6 +107,7 @@ def solve_game_bfs(game):
     """
     start_time = time.time()  # Start timer
     tracemalloc.start()  # Start memory tracking
+    isDone=False
 
     try:
         initial_state = game.copy()
@@ -115,12 +125,18 @@ def solve_game_bfs(game):
 
             # Check if we've reached the solved state.
             if current.is_solved():
+                isDone=True
                 end_time = time.time()  # End timer
                 current_mem, peak_mem = tracemalloc.get_traced_memory()  # Get memory usage
                 tracemalloc.stop()  # Stop memory tracking
 
                 print(f"Solution found in {end_time - start_time:.4f} seconds!")
                 print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
+                with open("statistics_bfs.txt", "w") as file:
+                    file.write(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB\n")
+                    file.write(f"Time taken: {end_time - start_time:.4f} seconds\n")
+                    file.write(f"Depth of solution: {depth}\n")
+                    file.write(f"Number of states explored: {len(visited)}\n")
                 return reconstruct_path_bfs(came_from, current)
 
             # Iterate over all possible moves from the current state.
@@ -155,9 +171,10 @@ def solve_game_bfs(game):
     except KeyboardInterrupt:
         print("Execution interrupted by user.")
     finally:
-        current_mem, peak_mem = tracemalloc.get_traced_memory()  # Get memory usage
-        tracemalloc.stop()
-        print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
+        if not isDone:
+            current_mem, peak_mem = tracemalloc.get_traced_memory()  # Get memory usage
+            tracemalloc.stop()
+            print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
 
 
 # DFS ---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -173,6 +190,7 @@ def solve_game_dfs(game, max_depth=45):
     max_depth_reached = 0
     start_time = time.time()
     tracemalloc.start()
+    isDone=False
 
     try:
         initial_state = game.copy()
@@ -187,12 +205,18 @@ def solve_game_dfs(game, max_depth=45):
             print(f"Depth {depth}")
 
             if current.is_solved():
+                isDone=True
                 end_time = time.time()
                 current_mem, peak_mem = tracemalloc.get_traced_memory()
                 tracemalloc.stop()
 
                 print(f"Solution found in {end_time - start_time:.4f} seconds!")
                 print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
+                with open("statistics_dfs.txt", "w") as file:
+                    file.write(f"Max depth reached: {max_depth_reached}\n")
+                    file.write(f"States explored: {len(visited)}\n")
+                    file.write(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB\n")
+                    file.write(f"Time taken: {end_time - start_time:.4f} seconds\n")
                 return reconstruct_path_dfs(came_from, current)
 
             if depth >= max_depth:
@@ -226,10 +250,11 @@ def solve_game_dfs(game, max_depth=45):
     except KeyboardInterrupt:
         print("Execution interrupted by user.")
     finally:
-        current_mem, peak_mem = tracemalloc.get_traced_memory()
-        tracemalloc.stop()
-        print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
-        print(f"Maximum depth reached: {max_depth_reached}")
+        if not isDone:
+            current_mem, peak_mem = tracemalloc.get_traced_memory()
+            tracemalloc.stop()
+            print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
+            print(f"Maximum depth reached: {max_depth_reached}")
 
 
 # Auxiliary functions -----------------------------------------------------------------------------------------------------------------------------------------
@@ -304,7 +329,7 @@ def reconstruct_path_dfs(came_from, current):
 #     while x <= stop:
 #         yield x
 #         x += step
- 
+
 
 # # This function assumes that you have modified your game state or heuristic to accept weights.
 # # For example, your game object might have a method 'set_heuristic_weights' that the heuristic() method uses.
