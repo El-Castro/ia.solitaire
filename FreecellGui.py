@@ -27,6 +27,7 @@ class FreeCellGUI:
 
 
 # Initialization / Setup Methods ------------------------------------------------------------------------------------------------------------------------------
+
     def setup_ui(self):
         """Sets up the user interface for the FreeCell game."""
         self.root.title("FreeCell Solitaire")
