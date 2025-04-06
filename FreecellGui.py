@@ -252,30 +252,30 @@ class FreeCellGUI:
 # Game Control Methods ----------------------------------------------------------------------------------------------------------------------------------------        
 
 
-    def solve_game(self):
-        """Solves the game using AI and visualizes the moves."""
-        result = solve_game_bfs(self.game)
-        if result is not None:
-            print("Game solved by AI!")
-            for move in result:
-                if isinstance(move, str) and move.startswith("Supermove"):  # Supermove string
-                    # Parse and extract the details from the string
-                    match = re.match(r"Supermove\(source=(\d+), destination=(\d+), number of cards=(\d+)\)", move)
-                    if match:
-                        src = int(match.group(1))
-                        dest = int(match.group(2))
-                        num_cards = int(match.group(3))
-                        self.game = fcm.execute_supermove(self.game, src, dest, num_cards)
-                else:  # Regular atomic move
-                    self.game = self.game.apply_move(move)
+    # def solve_game(self):
+    #     """Solves the game using AI and visualizes the moves."""
+    #     result = solve_game_bfs(self.game)
+    #     if result is not None:
+    #         print("Game solved by AI!")
+    #         for move in result:
+    #             if isinstance(move, str) and move.startswith("Supermove"):  # Supermove string
+    #                 # Parse and extract the details from the string
+    #                 match = re.match(r"Supermove\(source=(\d+), destination=(\d+), number of cards=(\d+)\)", move)
+    #                 if match:
+    #                     src = int(match.group(1))
+    #                     dest = int(match.group(2))
+    #                     num_cards = int(match.group(3))
+    #                     self.game = fcm.execute_supermove(self.game, src, dest, num_cards)
+    #             else:  # Regular atomic move
+    #                 self.game = self.game.apply_move(move)
                     
-                self.game = fcm.apply_automatic_moves(self.game)
-                self.draw_board()
-                self.root.update_idletasks()
-                time.sleep(0.5)  # Add a delay to visualize the moves
-            self.winning_state()  # Call the method to remove buttons and display message
-        else:
-            print("AI could not solve the game.")
+    #             self.game = fcm.apply_automatic_moves(self.game)
+    #             self.draw_board()
+    #             self.root.update_idletasks()
+    #             time.sleep(0.5)  # Add a delay to visualize the moves
+    #         self.winning_state()  # Call the method to remove buttons and display message
+    #     else:
+    #         print("AI could not solve the game.")
 
     def winning_state(self):
         """Displays a pop-up message saying the game is over."""
@@ -362,39 +362,72 @@ class FreeCellGUI:
     def solve_game_AI_2(self):
         result = solve_game_astar(self.game)
         if result is not None:
+            print("Game solved by A Star!")
             for move in result:
-                self.game = self.game.apply_move(move)
+                if isinstance(move, str) and move.startswith("Supermove"):  # Supermove string
+                    # Parse and extract the details from the string
+                    match = re.match(r"Supermove\(source=(\d+), destination=(\d+), number of cards=(\d+)\)", move)
+                    if match:
+                        src = int(match.group(1))
+                        dest = int(match.group(2))
+                        num_cards = int(match.group(3))
+                        self.game = fcm.execute_supermove(self.game, src, dest, num_cards)
+                else:  # Regular atomic move
+                    self.game = self.game.apply_move(move)
+                    
                 self.game = fcm.apply_automatic_moves(self.game)
                 self.draw_board()
                 self.root.update_idletasks()
-                time.sleep(0.5)
-            self.winning_state()
+                time.sleep(0.5)  # Add a delay to visualize the moves
+            self.winning_state()  # Call the method to remove buttons and display message
         else:
-            print("AI could not solve the game.")
+            print("A Star could not solve the game.")
 
     def solve_game_bfs_2(self):
         result = solve_game_bfs(self.game)
         if result is not None:
+            print("Game solved by BFS!")
             for move in result:
-                self.game = self.game.apply_move(move)
+                if isinstance(move, str) and move.startswith("Supermove"):  # Supermove string
+                    # Parse and extract the details from the string
+                    match = re.match(r"Supermove\(source=(\d+), destination=(\d+), number of cards=(\d+)\)", move)
+                    if match:
+                        src = int(match.group(1))
+                        dest = int(match.group(2))
+                        num_cards = int(match.group(3))
+                        self.game = fcm.execute_supermove(self.game, src, dest, num_cards)
+                else:  # Regular atomic move
+                    self.game = self.game.apply_move(move)
+                    
                 self.game = fcm.apply_automatic_moves(self.game)
                 self.draw_board()
                 self.root.update_idletasks()
-                time.sleep(0.5)
-            self.winning_state()
+                time.sleep(0.5)  # Add a delay to visualize the moves
+            self.winning_state()  # Call the method to remove buttons and display message
         else:
             print("BFS could not solve the game.")
 
     def solve_game_dfs_2(self):
         result = solve_game_dfs(self.game)
         if result is not None:
+            print("Game solved by DFS!")
             for move in result:
-                self.game = self.game.apply_move(move)
+                if isinstance(move, str) and move.startswith("Supermove"):  # Supermove string
+                    # Parse and extract the details from the string
+                    match = re.match(r"Supermove\(source=(\d+), destination=(\d+), number of cards=(\d+)\)", move)
+                    if match:
+                        src = int(match.group(1))
+                        dest = int(match.group(2))
+                        num_cards = int(match.group(3))
+                        self.game = fcm.execute_supermove(self.game, src, dest, num_cards)
+                else:  # Regular atomic move
+                    self.game = self.game.apply_move(move)
+                    
                 self.game = fcm.apply_automatic_moves(self.game)
                 self.draw_board()
                 self.root.update_idletasks()
-                time.sleep(0.5)
-            self.winning_state()
+                time.sleep(0.5)  # Add a delay to visualize the moves
+            self.winning_state()  # Call the method to remove buttons and display message
         else:
             print("DFS could not solve the game.")
 
