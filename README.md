@@ -8,6 +8,8 @@
 
 ## Project Overview
 
+![Game Screenshot](assets/screenshot.png)
+
 This project implements the classic FreeCell Solitaire game using Python and Tkinter's graphical interface.
 This game comes combined with AI search algorithms like Breadth-First Search (BFS), Depth-First Search (DFS), and A Star with heuristics, in order to solve the game automatically.
 
