@@ -161,56 +161,80 @@ def solve_game_bfs(game):
 
 
 # DFS ---------------------------------------------------------------------------------------------------------------------------------------------------------
-def solve_game_dfs(game):
+
+
+def solve_game_dfs(game, max_depth=45):
+    """
+    Attempts to solve the Freecell game using depth-first search (DFS) with a depth limit.
+    It explores moves until a solution is found or the depth limit is reached.
+    If a solution is found, it reconstructs and returns the path of moves.
+    Otherwise, returns None.
+    """
+    max_depth_reached = 0
     start_time = time.time()
     tracemalloc.start()
 
-    initial_state = game.copy()
-    stack = [(initial_state, [], 0)]  # (state, path_so_far, depth)
-    visited = set()
-    visited.add(initial_state)
+    try:
+        initial_state = game.copy()
+        stack = [(initial_state, 0)]  # (state, depth)
+        came_from = {}
+        visited = set()
+        visited.add(initial_state)
 
-    max_depth = 0
-    visited_count = 1
+        while stack:
+            current, depth = stack.pop()
+            max_depth_reached = max(max_depth_reached, depth)
+            print(f"Depth {depth}")
 
-    while stack:
-        current, path, depth = stack.pop()
+            if current.is_solved():
+                end_time = time.time()
+                current_mem, peak_mem = tracemalloc.get_traced_memory()
+                tracemalloc.stop()
 
-        # Print depth at every step
-        print(f"Exploring depth: {depth}, visited nodes: {visited_count}")
+                print(f"Solution found in {end_time - start_time:.4f} seconds!")
+                print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
+                return reconstruct_path(came_from, current)
 
-        if depth > max_depth:
-            max_depth = depth
+            if depth >= max_depth:
+                continue  # Skip expanding this node
 
-        if current.is_solved():
-            end_time = time.time()
-            current_mem, peak_mem = tracemalloc.get_traced_memory()
-            tracemalloc.stop()
+            for move in current.get_possible_moves(True):
+                type_of_move = move.move_type
+                if type_of_move not in ("foundation_to_freecell", "foundation_to_tableau"):
+                    neighbor = current.copy().apply_move(move, True)
+                    neighbor = fcm.apply_automatic_moves(neighbor)
 
-            print(f"Solution found with DFS in {end_time - start_time:.4f} seconds!")
-            print(f"States visited: {visited_count}")
-            print(f"Max depth reached: {max_depth}")
-            print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
-            return path
+                    if neighbor not in visited:
+                        visited.add(neighbor)
+                        came_from[neighbor] = (current, move)
+                        stack.append((neighbor, depth + 1))
 
-        for move in current.get_possible_moves(True):
-            if move.move_type in {"foundation_to_freecell", "foundation_to_tableau"}:
-                continue
+            for src, dest, num_cards in fcm.get_possible_supermoves(current):
+                neighbor = current.copy()
+                neighbor = fcm.execute_supermove(neighbor, src, dest, num_cards)
+                supermove = f"Supermove(source={src}, destination={dest}, number of cards={num_cards})"
+                neighbor = fcm.apply_automatic_moves(neighbor)
 
-            next_state = current.copy().apply_move(move, True)
-            next_state = fcm.apply_automatic_moves(next_state)
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    came_from[neighbor] = (current, supermove)
+                    stack.append((neighbor, depth + 1))
 
-            if next_state not in visited:
-                visited.add(next_state)
-                visited_count += 1
-                stack.append((next_state, path + [move], depth + 1))
+        print("No solution found.")
+        return None
 
-    print("No solution found for DFS.")
-    print(f"Total states visited: {visited_count}")
-    print(f"Max depth reached: {max_depth}")
-    return None
+    except KeyboardInterrupt:
+        print("Execution interrupted by user.")
+    finally:
+        current_mem, peak_mem = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
+        print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
+        print(f"Maximum depth reached: {max_depth_reached}")
+
 
 # Auxiliary functions -----------------------------------------------------------------------------------------------------------------------------------------
+
+
 def reconstruct_path(came_from, current):
     # Reconstruct the path from the goal to the start
     total_path = []
