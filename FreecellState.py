@@ -144,7 +144,7 @@ class FreecellState:
 
     def heuristic(self):
         foundation_weight = 0.5
-        fc_weight = 0.25
+        fc_weight = 0.20
         fcol_weight = -0.5
         blocked_weight = 0.3
 

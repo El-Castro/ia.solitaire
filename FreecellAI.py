@@ -61,21 +61,21 @@ def solve_game_astar(game):
                     f_score[neighbor] = tentative_g_score + neighbor.heuristic()
                     heapq.heappush(open_set, (f_score[neighbor], tentative_g_score, neighbor))
 
-            # for src, dest, num_cards in fcm.get_possible_supermoves(current):
-            #     neighbor = current.copy()
-            #     neighbor = fcm.execute_supermove(neighbor, src, dest, num_cards)
-            #     supermove = f"Supermove(source={src}, destination={dest}, number of cards={num_cards})"
-            #     # Apply the move to get the neighbor state
-            #     neighbor = fcm.apply_automatic_moves(neighbor)
-            #     tentative_g_score = current_g + 1
+            for src, dest, num_cards in fcm.get_possible_supermoves(current):
+                neighbor = current.copy()
+                neighbor = fcm.execute_supermove(neighbor, src, dest, num_cards)
+                supermove = f"Supermove(source={src}, destination={dest}, number of cards={num_cards})"
+                # Apply the move to get the neighbor state
+                neighbor = fcm.apply_automatic_moves(neighbor)
+                tentative_g_score = current_g + 1
 
-            #     if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
-            #         came_from[neighbor] = (current, supermove)
-            #         g_score[neighbor] = tentative_g_score
-            #         f_score[neighbor] = tentative_g_score + neighbor.heuristic()
-            #         heapq.heappush(open_set, (f_score[neighbor], tentative_g_score, neighbor))
+                if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
+                    came_from[neighbor] = (current, supermove)
+                    g_score[neighbor] = tentative_g_score
+                    f_score[neighbor] = tentative_g_score + neighbor.heuristic()
+                    heapq.heappush(open_set, (f_score[neighbor], tentative_g_score, neighbor))
 
-        # If the open set is empty but the goal was never reached, return None
+        #If the open set is empty but the goal was never reached
         return None
 
     except KeyboardInterrupt:
