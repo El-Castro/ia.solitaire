@@ -239,10 +239,10 @@ class FreeCellGUI:
     def get_card_position(self, type, index):
         """Returns the x, y position of a card based on its type and index."""
         if type == "freecell":
-            return (50 + index * 100, 50)
+            return (85 + index * 100, 50)  # Adjusted x-coordinate to match draw_board
         elif type == "foundation":
             foundation_map = {"hearts": 0, "diamonds": 1, "clubs": 2, "spades": 3}
-            return (450 + foundation_map[index] * 100, 50)
+            return (485 + foundation_map[index] * 100, 50)  # Adjusted x-coordinate to match draw_board
         elif type == "tableau":
             column = self.game.tableau[index]
             return (85 + index * 100, 200 + (len(column) - 1) * 30)
@@ -257,7 +257,6 @@ class FreeCellGUI:
             messagebox.showinfo("Game Over", "Game Solved 🎉")
         except Exception as e:
             print(f"Error showing messagebox: {e}")
-
 
     def hint_move(self):
         #get possible free moves for the current state 
@@ -404,7 +403,6 @@ class FreeCellGUI:
             self.winning_state()  # Call the method to remove buttons and display message
         else:
             print("DFS could not solve the game.")
-
     
     def hide_solver_ui(self):
         """Attempts to remove solver UI buttons and returns True if successful."""
