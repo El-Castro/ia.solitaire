@@ -18,7 +18,9 @@ class FreecellState:
 
     def copy(self):
         """Creates a deep copy of the current FreecellState instance."""
-        return FreecellState([col[:] for col in self.tableau], self.free_cells[:], self.foundations.copy())
+        new_state= FreecellState([col[:] for col in self.tableau], self.free_cells[:], self.foundations.copy())
+        new_state.history = self.history[:]
+        return new_state
 
     def is_solved(self):
         """Checks if the current FreecellState is in a solved state."""

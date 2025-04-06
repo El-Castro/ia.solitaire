@@ -413,6 +413,7 @@ def execute_supermove(state, src, dest, num_cards):
 
     # Check if the move is valid
     new_state = state.copy()
+    new_state.save_state()  # Save current state before applying the move
     new_state.tableau[dest].extend(new_state.tableau[src][-num_cards:])
     del new_state.tableau[src][-num_cards:]
     print(f"S {src} {dest} {num_cards}")

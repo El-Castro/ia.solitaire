@@ -193,7 +193,7 @@ def solve_game_dfs(game, max_depth=45):
 
                 print(f"Solution found in {end_time - start_time:.4f} seconds!")
                 print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
-                return reconstruct_path(came_from, current)
+                return reconstruct_path_dfs(came_from, current)
 
             if depth >= max_depth:
                 continue  # Skip expanding this node
@@ -266,6 +266,24 @@ def reconstruct_path_astar(came_from, current):
     
     # Write the total path to a file
     with open("solution_path_astar.txt", "w") as file:
+        for move in total_path:
+            file.write(f"{move}\n")
+
+    return total_path
+
+def reconstruct_path_dfs(came_from, current):
+    # Reconstruct the path from the goal to the start
+    total_path = []
+    while current in came_from:
+        current, move = came_from[current]
+        total_path.append(move)
+    total_path.reverse()  # Reverse the path to get it from start to goal
+
+    # Print the total path length
+    print(f"{len(total_path)}\n")
+    
+    # Write the total path to a file
+    with open("solution_path_dfs.txt", "w") as file:
         for move in total_path:
             file.write(f"{move}\n")
 
