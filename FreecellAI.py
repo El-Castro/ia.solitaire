@@ -3,6 +3,8 @@ import time
 import tracemalloc
 import FreecellMove as fcm
 import heapq
+from FreecellState import FreecellState
+
 
 
 # A Star ------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -147,17 +149,56 @@ def solve_game_bfs(game):
 
 
 # DFS ---------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
 def solve_game_dfs(game):
+    start_time = time.time()
+    tracemalloc.start()
 
-    print("Unnavailable: DFS under construction.")
+    initial_state = game.copy()
+    stack = [(initial_state, [], 0)]  # (state, path_so_far, depth)
+    visited = set()
+    visited.add(initial_state)
+
+    max_depth = 0
+    visited_count = 1
+
+    while stack:
+        current, path, depth = stack.pop()
+
+        # Print depth at every step
+        print(f"Exploring depth: {depth}, visited nodes: {visited_count}")
+
+        if depth > max_depth:
+            max_depth = depth
+
+        if current.is_solved():
+            end_time = time.time()
+            current_mem, peak_mem = tracemalloc.get_traced_memory()
+            tracemalloc.stop()
+
+            print(f"Solution found with DFS in {end_time - start_time:.4f} seconds!")
+            print(f"States visited: {visited_count}")
+            print(f"Max depth reached: {max_depth}")
+            print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
+            return path
+
+        for move in current.get_possible_moves(True):
+            if move.move_type in {"foundation_to_freecell", "foundation_to_tableau"}:
+                continue
+
+            next_state = current.copy().apply_move(move, True)
+            next_state = fcm.apply_automatic_moves(next_state)
+
+            if next_state not in visited:
+                visited.add(next_state)
+                visited_count += 1
+                stack.append((next_state, path + [move], depth + 1))
+
+    print("No solution found for DFS.")
+    print(f"Total states visited: {visited_count}")
+    print(f"Max depth reached: {max_depth}")
     return None
 
-
 # Auxiliary functions -----------------------------------------------------------------------------------------------------------------------------------------
-
-
 def reconstruct_path(came_from, current):
     # Reconstruct the path from the goal to the start
     total_path = []
