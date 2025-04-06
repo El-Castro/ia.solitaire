@@ -1,2 +1,6 @@
 /__pycache__
 solution_path.txt
+statistics_astar.txt
+solution_path_astar.txt
+statistics_bfs.txt
+solution_path_bfs.txt

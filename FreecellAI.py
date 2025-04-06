@@ -60,7 +60,7 @@ def solve_game_astar(game):
                 # Apply the move to get the neighbor state
                 neighbor = current.copy().apply_move(move, True)
                 neighbor = fcm.apply_automatic_moves(neighbor)
-                tentative_g_score = current_g + 1# + len(auto_moves)
+                tentative_g_score = current_g + 1
 
                 # If this path to neighbor is better than any previous one, record it
                 if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
@@ -315,65 +315,72 @@ def reconstruct_path_dfs(came_from, current):
     return total_path
 
 
-# Testing --------------------------------------------------------------------------------------------------------------------------------------------------------
+# Functions for A* weight testing --------------------------------------------------------------------------------------------------------------------------------------------------------
 
  
-# import itertools
-# import time
-# from concurrent.futures import ProcessPoolExecutor, TimeoutError
+import itertools
+import time
+from concurrent.futures import ProcessPoolExecutor, TimeoutError
  
 
-# # Helper: float range generator.
-# def frange(start, stop, step):
-#     x = start
-#     while x <= stop:
-#         yield x
-#         x += step
+# Helper: float range generator.
+def frange(start, stop, step):
+    x = start
+    while x <= stop + 1e-9:
+        yield round(x, 3)
+        x += step
 
 
-# # This function assumes that you have modified your game state or heuristic to accept weights.
-# # For example, your game object might have a method 'set_heuristic_weights' that the heuristic() method uses.
-# def run_astar_with_weights(game, foundation_weight, fc_weight, fcol_weight, blocked_weight):
-#     # Update heuristic weights on the game state (or on a copy)
-#     game.set_heuristic_weights(foundation_weight, fc_weight, fcol_weight, blocked_weight)
-#     start_time = time.time()
-#     path = solve_game_astar(game)
-#     elapsed = time.time() - start_time
-#     cost = len(path) if path is not None else float('inf')
-#     return (foundation_weight, fc_weight, fcol_weight, blocked_weight, cost, elapsed)
+# This function assumes that you have modified your game state or heuristic to accept weights.
+# For example, your game object might have a method 'set_heuristic_weights' that the heuristic() method uses.
+def run_astar_with_weights(game, foundation_weight, fc_weight, fcol_weight, blocked_weight, modifier):
+    # Update heuristic weights on the game state (or on a copy)
+    game.set_heuristic_weights(foundation_weight, fc_weight, fcol_weight, blocked_weight, modifier)
+    start_time = time.time()
+    path = solve_game_astar(game)
+    elapsed = time.time() - start_time
+    cost = len(path) if path is not None else float('inf')
+    return (foundation_weight, fc_weight, fcol_weight, blocked_weight, modifier, cost, elapsed)
  
 
-# def grid_search(game, weight_ranges, timeout=10):
-#     """
-#     Searches over combinations of heuristic weights.
-#     weight_ranges is a dict with keys:
-#     'foundation', 'fc', 'fcol', 'blocked'
-#     each as a tuple: (start, stop, step)
-#     timeout: maximum time (in seconds) allowed per combination.
-#     """
-#     best = None
-#     best_combo = None
-#     all_combos = list(itertools.product(
-#         frange(*weight_ranges['foundation']),
-#         frange(*weight_ranges['fc']),
-#         frange(*weight_ranges['fcol']),
-#         frange(*weight_ranges['blocked'])
-#     ))
-#     results = []
-#     with ProcessPoolExecutor() as executor:
-#         # Submit a job for each combination.
-#         futures = {executor.submit(run_astar_with_weights, game.copy(), *combo): combo for combo in all_combos}
-#         for future in futures:
-#             try:
-#                 result = future.result(timeout=timeout)
-#                 results.append(result)
-#                 print("Tested combo:", result)
-#                 # result is a tuple: (foundation_weight, fc_weight, fcol_weight, blocked_weight, cost, elapsed)
-#                 if best is None or result[4] < best:
-#                     best = result[4]
-#                     best_combo = result[:4]
-#             except TimeoutError:
-#                 print("Timeout for combination", futures[future])
-#             except Exception as e:
-#                 print("Error for combination", futures[future], ":", e)
-#     return best_combo, best, results
+def grid_search(game, weight_ranges, timeout=10):
+    """
+    Searches over combinations of heuristic weights.
+    weight_ranges is a dict with keys:
+    'foundation', 'fc', 'fcol', 'blocked', 'modifier'
+    each as a tuple: (start, stop, step)
+    timeout: maximum time (in seconds) allowed per combination.
+    """
+    best = None
+    best_combo = None
+    all_combos = list(itertools.product(
+        frange(*weight_ranges['foundation']),
+        frange(*weight_ranges['fc']),
+        frange(*weight_ranges['fcol']),
+        frange(*weight_ranges['blocked']),
+        frange(*weight_ranges['modifier'])
+    ))
+    results = []
+    timeouts = 0
+
+    with ProcessPoolExecutor() as executor:
+        futures = {executor.submit(run_astar_with_weights, game.copy(), *combo): combo for combo in all_combos}
+        for future in futures:
+            try:
+                result = future.result(timeout=timeout)
+                results.append(result)
+                print("Tested combo:", result)
+                cost = result[5]
+                combo = result[:5]
+                if best is None or cost < best:
+                    best = cost
+                    best_combos = [combo]
+                elif cost == best:
+                    best_combos.append(combo)
+            except TimeoutError:
+                print("Timeout for combination", futures[future])
+                timeouts += 1
+            except Exception as e:
+                print("Error for combination", futures[future], ":", e)
+
+    return best_combos, best, results

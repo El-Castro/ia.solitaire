@@ -9,7 +9,7 @@ from PIL import Image, ImageTk
 import FreecellMove as fcm
 from Card import Card
 from Move import Move
-from FreecellAI import solve_game_astar,solve_game_bfs, solve_game_dfs
+from FreecellAI import solve_game_astar,solve_game_bfs, solve_game_dfs, grid_search
 from FreecellState import FreecellState
 import random
 
@@ -311,16 +311,21 @@ class FreeCellGUI:
     def solve_game(self):
         self.title_id = self.canvas.create_text(450, 610, text="Choose an algorithm to solve the game", font=("Helvetica", 15), fill="white")
     
+        self.solve_button_tester = Button(self.root, text="tester", command=self.solve_game_tester)
         self.solve_button_AI = Button(self.root, text="A*", command=self.solve_game_AI)
         self.solve_button_BFS = Button(self.root, text="BFS", command=self.solve_game_bfs)
         self.solve_button_DFS = Button(self.root, text="DFS", command=self.solve_game_dfs)
 
         # Store canvas windows IDs
+        self.solve_button_tester_id = self.canvas.create_window(100, 650, window=self.solve_button_tester, width=110, height=35)
         self.solve_button_AI_id = self.canvas.create_window(280, 650, window=self.solve_button_AI, width=110, height=35)
         self.solve_button_BFS_id = self.canvas.create_window(430, 650, window=self.solve_button_BFS, width=110, height=35)
         self.solve_button_DFS_id = self.canvas.create_window(580, 650, window=self.solve_button_DFS, width=110, height=35)
 
-                            
+    def solve_game_tester(self):
+        if self.hide_solver_ui():
+            self.root.after(100, self.solve_game_tester_2)
+
     def solve_game_AI(self):
         if self.hide_solver_ui():
             self.root.after(100, self.solve_game_AI_2)
@@ -332,6 +337,20 @@ class FreeCellGUI:
     def solve_game_dfs(self):
         if self.hide_solver_ui():
             self.root.after(100, self.solve_game_dfs_2)
+
+    def solve_game_tester_2(self):
+        """Solves the game using AI and visualizes the moves."""
+        # Example weight ranges (you can adjust these as needed):
+        weight_ranges = {
+            'foundation': (0.5, 1, 0.2),  # e.g., 0.5, 0.75, 1.0, 1.25, 1.5
+            'fc': (0.05, 0.3, 0.05),           # e.g., 0.1, 0.2, 0.3, 0.4, 0.5
+            'fcol': (-2, -0.5, 0.25),         # e.g., -2.0, -1.5, -1.0, -0.5
+            'blocked': (0.0, 0.40, 0.05),       # e.g., 0.1, 0.15, 0.2, 0.25, 0.3
+            'modifier': (1, 4, 0.5)
+        }
+
+        best_combo, best_cost, all_results = grid_search(self.game, weight_ranges, timeout=10)
+        print("Best weight combination:", best_combo, "with cost:", best_cost)
 
     def solve_game_AI_2(self):
         result = solve_game_astar(self.game)
@@ -408,10 +427,12 @@ class FreeCellGUI:
     def hide_solver_ui(self):
         """Attempts to remove solver UI buttons and returns True if successful."""
         try:
+            self.solve_button_tester.destroy()
             self.solve_button_AI.destroy()
             self.solve_button_BFS.destroy()
             self.solve_button_DFS.destroy()
 
+            self.canvas.delete(self.solve_button_tester_id)
             self.canvas.delete(self.solve_button_AI_id)
             self.canvas.delete(self.solve_button_BFS_id)
             self.canvas.delete(self.solve_button_DFS_id)
@@ -429,14 +450,3 @@ class FreeCellGUI:
             widget.destroy()
         
         FreecellMenu.setup_menu(self)
-
-        
-
-        
-        
-
-
-
-
-
-

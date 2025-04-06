@@ -6,6 +6,13 @@ import random
 import os
 import json
 
+HEURISTIC_WEIGHTS = {
+    'foundation': 0.5,
+    'fc': 0.2,
+    'fcol': -0.5,
+    'blocked': 0.30,
+    'modifier': 1
+}
 
 class FreecellState:
     def __init__(self, tableau, free_cells=None, foundations=None,minutes = None, seconds = None):
@@ -36,6 +43,13 @@ class FreecellState:
         self.heuristic()
         return self
 
+    def set_heuristic_weights(self, foundation, fc, fcol, blocked, modifier):
+        global HEURISTIC_WEIGHTS
+        HEURISTIC_WEIGHTS['foundation'] = foundation
+        HEURISTIC_WEIGHTS['fc'] = fc
+        HEURISTIC_WEIGHTS['fcol'] = fcol
+        HEURISTIC_WEIGHTS['blocked'] = blocked
+        HEURISTIC_WEIGHTS['modifier'] = modifier
 
 # Saves & Presets -----------------------------------------------------------------------------------------------------------------------------
 
@@ -145,10 +159,12 @@ class FreecellState:
     """Calculates a heuristic value for the current FreecellState."""
 
     def heuristic(self):
-        foundation_weight = 0.5
-        fc_weight = 0.20
-        fcol_weight = -0.5
-        blocked_weight = 0.3
+        w = HEURISTIC_WEIGHTS
+        # foundation_weight = 0.5
+        # fc_weight = 0.20
+        # fcol_weight = -0.5
+        # blocked_weight = 0.3
+        # modifier = 2
 
         foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
         blocked_free_cells = 0
@@ -175,13 +191,25 @@ class FreecellState:
                 suit, rank = card.suit, card.rank
                 if suit in found_suits: continue    # Skip card if suit is already found
                 if suit in next_needed and rank == next_needed[suit]:  # It's a needed card
-                    blocked_next_cards += (len(col) - depth)/2 # Penalize based on how deep it's buried
+                    blocked_next_cards += (len(col) - depth)/w['modifier']#modifier # Penalize based on how deep it's buried
                     found_suits.add(suit)  # Add suit to found suits
                     if len(found_suits) == len(next_needed): break # Stop if all needed suits were found
                 
-        score = round(foundation_weight * foundation_score + blocked_weight * blocked_next_cards + fc_weight * blocked_free_cells + fcol_weight * free_columns,3)
+        score = (w['foundation'] * foundation_score +
+                 w['blocked'] * blocked_next_cards +
+                 w['fc'] * blocked_free_cells +
+                 w['fcol'] * free_columns)
 
-        print(f"Foundation: {round(foundation_weight * foundation_score,3)}, Blocked: {round(blocked_weight * blocked_next_cards,3)}, Free Cells: {round(fc_weight * blocked_free_cells,3)}, Free Columns: {round(fcol_weight * free_columns,3)}, Total: {score}\n")
+        print(f"Foundation: {w['foundation'] * foundation_score}, "
+              f"Blocked: {w['blocked'] * blocked_next_cards}, "
+              f"Free Cells: {w['fc'] * blocked_free_cells}, "
+              f"Free Columns: {w['fcol'] * free_columns}, "
+              f"Modifier: {w['modifier']}, "
+              f"Total: {score}")
+        
+        #score = round(foundation_weight * foundation_score + blocked_weight * blocked_next_cards + fc_weight * blocked_free_cells + fcol_weight * free_columns,3)
+
+        #print(f"Foundation: {round(foundation_weight * foundation_score,3)}, Blocked: {round(blocked_weight * blocked_next_cards,3)}, Free Cells: {round(fc_weight * blocked_free_cells,3)}, Free Columns: {round(fcol_weight * free_columns,3)}, Total: {score}\n")
         return score
 
 
