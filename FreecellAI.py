@@ -134,6 +134,18 @@ def solve_game_bfs(game):
                         queue.append((neighbor, depth + 1))
                         # Debug: Print the move and new state
 
+            for src, dest, num_cards in fcm.get_possible_supermoves(current):
+                neighbor = current.copy()
+                neighbor = fcm.execute_supermove(neighbor, src, dest, num_cards)
+                supermove = f"Supermove(source={src}, destination={dest}, number of cards={num_cards})"
+                neighbor = fcm.apply_automatic_moves(neighbor)
+
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    came_from[neighbor] = (current, supermove)
+                    queue.append((neighbor, depth + 1))
+                    # Debug: Print the move and new state
+
         # If no solution was found
         print("No solution found.")
         return None
