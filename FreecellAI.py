@@ -43,7 +43,7 @@ def solve_game_astar(game):
 
                 print(f"Solution found in {end_time - start_time:.4f} seconds!")
                 print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
-                return reconstruct_path(came_from, current)
+                return reconstruct_path_astar(came_from, current)
 
             # Iterate through the possible moves from the current state
             for move in current.get_possible_moves_Astar():
@@ -59,19 +59,19 @@ def solve_game_astar(game):
                     f_score[neighbor] = tentative_g_score + neighbor.heuristic()
                     heapq.heappush(open_set, (f_score[neighbor], tentative_g_score, neighbor))
 
-            for src, dest, num_cards in fcm.get_possible_supermoves(current):
-                neighbor = current.copy()
-                neighbor = fcm.execute_supermove(neighbor, src, dest, num_cards)
-                supermove = f"Supermove(source={src}, destination={dest}, number of cards={num_cards})"
-                # Apply the move to get the neighbor state
-                neighbor = fcm.apply_automatic_moves(neighbor)
-                tentative_g_score = current_g + 1
+            # for src, dest, num_cards in fcm.get_possible_supermoves(current):
+            #     neighbor = current.copy()
+            #     neighbor = fcm.execute_supermove(neighbor, src, dest, num_cards)
+            #     supermove = f"Supermove(source={src}, destination={dest}, number of cards={num_cards})"
+            #     # Apply the move to get the neighbor state
+            #     neighbor = fcm.apply_automatic_moves(neighbor)
+            #     tentative_g_score = current_g + 1
 
-                if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
-                    came_from[neighbor] = (current, supermove)
-                    g_score[neighbor] = tentative_g_score
-                    f_score[neighbor] = tentative_g_score + neighbor.heuristic()
-                    heapq.heappush(open_set, (f_score[neighbor], tentative_g_score, neighbor))
+            #     if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
+            #         came_from[neighbor] = (current, supermove)
+            #         g_score[neighbor] = tentative_g_score
+            #         f_score[neighbor] = tentative_g_score + neighbor.heuristic()
+            #         heapq.heappush(open_set, (f_score[neighbor], tentative_g_score, neighbor))
 
         # If the open set is empty but the goal was never reached, return None
         return None
@@ -119,7 +119,7 @@ def solve_game_bfs(game):
 
                 print(f"Solution found in {end_time - start_time:.4f} seconds!")
                 print(f"Peak memory usage: {peak_mem / 1024 / 1024:.4f} MB")
-                return reconstruct_path(came_from, current)
+                return reconstruct_path_bfs(came_from, current)
 
             # Iterate over all possible moves from the current state.
             for move in current.get_possible_moves(True):
@@ -158,7 +158,7 @@ def solve_game_dfs(game):
 # Auxiliary functions -----------------------------------------------------------------------------------------------------------------------------------------
 
 
-def reconstruct_path(came_from, current):
+def reconstruct_path_bfs(came_from, current):
     # Reconstruct the path from the goal to the start
     total_path = []
     while current in came_from:
@@ -170,7 +170,25 @@ def reconstruct_path(came_from, current):
     print(f"{len(total_path)}\n")
     
     # Write the total path to a file
-    with open("solution_path.txt", "w") as file:
+    with open("solution_path_bfs.txt", "w") as file:
+        for move in total_path:
+            file.write(f"{move}\n")
+
+    return total_path
+
+def reconstruct_path_astar(came_from, current):
+    # Reconstruct the path from the goal to the start
+    total_path = []
+    while current in came_from:
+        current, move = came_from[current]
+        total_path.append(move)
+    total_path.reverse()  # Reverse the path to get it from start to goal
+
+    # Print the total path length
+    print(f"{len(total_path)}\n")
+    
+    # Write the total path to a file
+    with open("solution_path_astar.txt", "w") as file:
         for move in total_path:
             file.write(f"{move}\n")
 
