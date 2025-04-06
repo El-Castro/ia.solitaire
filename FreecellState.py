@@ -6,6 +6,14 @@ import random
 import os
 import json
 
+# HEURISTIC_WEIGHTS = {
+#     'foundation': 0.5,
+#     'fc': 0.0,
+#     'fcol': -0.5,
+#     'blocked': 0.0,
+#     'modifier': 1
+# }
+
 HEURISTIC_WEIGHTS = {
     'foundation': 0.5,
     'fc': 0.2,
@@ -162,11 +170,6 @@ class FreecellState:
         Calculates a heuristic score for the current Freecell game state.
         """
         w = HEURISTIC_WEIGHTS
-        # foundation_weight = 0.5
-        # fc_weight = 0.20
-        # fcol_weight = -0.5
-        # blocked_weight = 0.3
-        # modifier = 2
 
         foundation_score = sum(13 - self.foundations[suit] for suit in self.foundations)
         blocked_free_cells = 0
@@ -208,8 +211,6 @@ class FreecellState:
               f"Free Columns: {w['fcol'] * free_columns}, "
               f"Modifier: {w['modifier']}, "
               f"Total: {score}")
-        
-        #score = round(foundation_weight * foundation_score + blocked_weight * blocked_next_cards + fc_weight * blocked_free_cells + fcol_weight * free_columns,3)
 
         #print(f"Foundation: {round(foundation_weight * foundation_score,3)}, Blocked: {round(blocked_weight * blocked_next_cards,3)}, Free Cells: {round(fc_weight * blocked_free_cells,3)}, Free Columns: {round(fcol_weight * free_columns,3)}, Total: {score}\n")
         return score

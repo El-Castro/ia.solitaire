@@ -4,3 +4,5 @@ statistics_astar.txt
 solution_path_astar.txt
 statistics_bfs.txt
 solution_path_bfs.txt
+solution_path_dfs.txt
+statistics_dfs.txt

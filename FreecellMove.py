@@ -394,7 +394,7 @@ def can_supermove(state, src, dest):
 
     return 0  # No valid supermove found
 
-def execute_supermove(state, src, dest, num_cards):
+def execute_supermove(state, src, dest, num_cards, AImode=False):
     """
     Executes a supermove in the Freecell game, transferring a specified number of cards from a source column to a destination column if the move is valid.
     """
@@ -407,6 +407,6 @@ def execute_supermove(state, src, dest, num_cards):
     new_state.save_state()  # Save current state before applying the move
     new_state.tableau[dest].extend(new_state.tableau[src][-num_cards:])
     del new_state.tableau[src][-num_cards:]
-    print(f"S {src} {dest} {num_cards}")
+    if not AImode: print(f"S {src} {dest} {num_cards}")
 
     return new_state

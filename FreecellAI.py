@@ -72,7 +72,7 @@ def solve_game_astar(game):
 
             for src, dest, num_cards in fcm.get_possible_supermoves(current):
                 neighbor = current.copy()
-                neighbor = fcm.execute_supermove(neighbor, src, dest, num_cards)
+                neighbor = fcm.execute_supermove(neighbor, src, dest, num_cards, True)
                 supermove = f"Supermove(source={src}, destination={dest}, number of cards={num_cards})"
                 # Apply the move to get the neighbor state
                 neighbor = fcm.apply_automatic_moves(neighbor)
@@ -124,6 +124,7 @@ def solve_game_bfs(game):
 
             # Debug: Print the current depth and state
             print(f"{depth}")
+            print(f"{len(visited)}")
 
             # Check if we've reached the solved state.
             if current.is_solved():
@@ -156,7 +157,7 @@ def solve_game_bfs(game):
 
             for src, dest, num_cards in fcm.get_possible_supermoves(current):
                 neighbor = current.copy()
-                neighbor = fcm.execute_supermove(neighbor, src, dest, num_cards)
+                neighbor = fcm.execute_supermove(neighbor, src, dest, num_cards, True)
                 supermove = f"Supermove(source={src}, destination={dest}, number of cards={num_cards})"
                 neighbor = fcm.apply_automatic_moves(neighbor)
 
@@ -205,6 +206,7 @@ def solve_game_dfs(game, max_depth=45):
             current, depth = stack.pop()
             max_depth_reached = max(max_depth_reached, depth)
             print(f"Depth {depth}")
+            print(f"{len(visited)}")
 
             if current.is_solved():
                 isDone=True
@@ -237,7 +239,7 @@ def solve_game_dfs(game, max_depth=45):
 
             for src, dest, num_cards in fcm.get_possible_supermoves(current):
                 neighbor = current.copy()
-                neighbor = fcm.execute_supermove(neighbor, src, dest, num_cards)
+                neighbor = fcm.execute_supermove(neighbor, src, dest, num_cards, True)
                 supermove = f"Supermove(source={src}, destination={dest}, number of cards={num_cards})"
                 neighbor = fcm.apply_automatic_moves(neighbor)
 
@@ -327,7 +329,8 @@ def reconstruct_path_dfs(came_from, current):
 
  
 import itertools
-import time
+import csv
+import os
 from concurrent.futures import ProcessPoolExecutor, TimeoutError
  
 
@@ -335,14 +338,11 @@ from concurrent.futures import ProcessPoolExecutor, TimeoutError
 def frange(start, stop, step):
     x = start
     while x <= stop + 1e-9:
-        yield round(x, 3)
+        yield round(x, 2)
         x += step
 
 
-# This function assumes that you have modified your game state or heuristic to accept weights.
-# For example, your game object might have a method 'set_heuristic_weights' that the heuristic() method uses.
 def run_astar_with_weights(game, foundation_weight, fc_weight, fcol_weight, blocked_weight, modifier):
-    # Update heuristic weights on the game state (or on a copy)
     game.set_heuristic_weights(foundation_weight, fc_weight, fcol_weight, blocked_weight, modifier)
     start_time = time.time()
     path = solve_game_astar(game)
@@ -351,7 +351,7 @@ def run_astar_with_weights(game, foundation_weight, fc_weight, fcol_weight, bloc
     return (foundation_weight, fc_weight, fcol_weight, blocked_weight, modifier, cost, elapsed)
  
 
-def grid_search(game, weight_ranges, timeout=10):
+def grid_search(game, weight_ranges, timeout, results_file="heuristic_test_results.csv"):
     """
     Searches over combinations of heuristic weights.
     weight_ranges is a dict with keys:
@@ -360,7 +360,7 @@ def grid_search(game, weight_ranges, timeout=10):
     timeout: maximum time (in seconds) allowed per combination.
     """
     best = None
-    best_combo = None
+    best_combos = []
     all_combos = list(itertools.product(
         frange(*weight_ranges['foundation']),
         frange(*weight_ranges['fc']),
@@ -371,20 +371,41 @@ def grid_search(game, weight_ranges, timeout=10):
     results = []
     timeouts = 0
 
+    file_exists = os.path.exists(results_file)
+
     with ProcessPoolExecutor() as executor:
         futures = {executor.submit(run_astar_with_weights, game.copy(), *combo): combo for combo in all_combos}
+
+        with open(results_file, mode='a', newline='') as file:
+            writer = csv.writer(file)
+
+            # Write header if it's the first time
+            if not file_exists:
+                writer.writerow(['foundation', 'fc', 'fcol', 'blocked', 'modifier', 'cost', 'elapsed'])
+
         for future in futures:
             try:
                 result = future.result(timeout=timeout)
-                results.append(result)
-                print("Tested combo:", result)
-                cost = result[5]
-                combo = result[:5]
-                if best is None or cost < best:
-                    best = cost
-                    best_combos = [combo]
-                elif cost == best:
-                    best_combos.append(combo)
+                if result:
+                    results.append(result)
+                    #print("Tested combo:", result)
+                    cost = result[5]
+                    combo = result[:5]
+                    print("Combo:", combo, "Cost:", cost, "Elapsed:", result[6])
+                    # Write the combo and the cost + elapsed time to CSV
+                    try:
+                        with open("heuristic_test_results.csv", mode='a', newline='') as file:
+                            writer = csv.writer(file)
+                            writer.writerow(combo + (cost, result[6]))  # Add cost and elapsed time to the row
+                    except Exception as e:
+                        print("Error writing to CSV:", e)
+    
+                    if best is None or cost < best:
+                        best = cost
+                        best_combos = [combo]
+                    elif cost == best:
+                        best_combos.append(combo)
+                        
             except TimeoutError:
                 print("Timeout for combination", futures[future])
                 timeouts += 1

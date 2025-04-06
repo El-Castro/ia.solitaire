@@ -358,17 +358,16 @@ class FreeCellGUI:
             self.root.after(100, self.solve_game_dfs_2)
 
     def solve_game_tester_2(self):
-        """Solves the game using AI and visualizes the moves."""
-        # Example weight ranges (you can adjust these as needed):
+        """Solves the current Freecell game using a grid search algorithm with different weight combinations."""
         weight_ranges = {
-            'foundation': (0.5, 1, 0.2),  # e.g., 0.5, 0.75, 1.0, 1.25, 1.5
-            'fc': (0.05, 0.3, 0.05),           # e.g., 0.1, 0.2, 0.3, 0.4, 0.5
+            'foundation': (0.5, 1, 0.25),  # e.g., 0.5, 0.75, 1.0, 1.25, 1.5
+            'fc': (0.00, 0.3, 0.05),           # e.g., 0.1, 0.2, 0.3, 0.4, 0.5
             'fcol': (-2, -0.5, 0.25),         # e.g., -2.0, -1.5, -1.0, -0.5
             'blocked': (0.0, 0.40, 0.05),       # e.g., 0.1, 0.15, 0.2, 0.25, 0.3
             'modifier': (1, 4, 0.5)
         }
 
-        best_combo, best_cost, all_results = grid_search(self.game, weight_ranges, timeout=10)
+        best_combo, best_cost, all_results = grid_search(self.game, weight_ranges, 5)
         print("Best weight combination:", best_combo, "with cost:", best_cost)
 
     def solve_game_AI_2(self):
