@@ -10,11 +10,10 @@
             [{"rank": 10, "suit": "diamonds"}, {"rank": 4, "suit": "spades"}, {"rank": 12, "suit": "clubs"}, {"rank": 6, "suit": "hearts"}, {"rank": 2, "suit": "spades"}, {"rank": 6, "suit": "spades"}],
             [{"rank": 8, "suit": "spades"}, {"rank": 2, "suit": "clubs"}, {"rank": 10, "suit": "clubs"}, {"rank": 9, "suit": "hearts"}, {"rank": 4, "suit": "clubs"}, {"rank": 3, "suit": "diamonds"}],
             [{"rank": 13, "suit": "diamonds"}, {"rank": 7, "suit": "clubs"}, {"rank": 7, "suit": "hearts"}, {"rank": 6, "suit": "clubs"}, {"rank": 3, "suit": "spades"}, {"rank": 1, "suit": "spades"}]
-        ],
+        ],    
         "free_cells": [null, null, null, null],
         "foundations": {"hearts": 0, "diamonds": 0, "clubs": 0, "spades": 0}
     },
-    
     {
         "name": "Very easy 2",
         "tableau": [
@@ -30,7 +29,6 @@
         "free_cells": [null, null, null, null],
         "foundations": {"hearts": 0, "diamonds": 0, "clubs": 0, "spades": 0}
     },
-
     {
         "name": "Medium",
         "tableau": [
@@ -46,7 +44,6 @@
         "free_cells": [null, null, null, null],
         "foundations": {"hearts": 0, "diamonds": 0, "clubs": 0, "spades": 0}
     },
-
     {
         "name": "Medium in progress",
         "tableau": [
@@ -62,7 +59,6 @@
         "free_cells": [null, null, null, null],
         "foundations": {"hearts": 1, "diamonds": 3, "clubs": 1, "spades": 2}
     },
-      
     {
         "name": "Super hard",
         "tableau": [
@@ -78,7 +74,6 @@
         "free_cells": [null, null, null, null],
         "foundations": {"hearts": 0, "diamonds": 0, "clubs": 0, "spades": 0}
     },
-
     {
         "name": "nearly solved",
         "tableau": [

@@ -92,7 +92,7 @@ class FreecellMenu:
             self.canvas.delete("all")
             self.canvas.create_image(0, 0, image=self.bg_photo, anchor="nw")
             
-            button_font = ("Arial", 14, "bold")
+            button_font = ("Arial", 10, "bold")
             padding = 0 
 
             for preset in presets:
@@ -102,7 +102,7 @@ class FreecellMenu:
                 btn = Button(self.root, text=preset_name, font=button_font, bg="lightgrey",
                          command=lambda p=preset: self.start_game(p))  
                 # Add button to canvas
-                self.canvas.create_window(padding * 150, 270, window=btn, width=130, height=50)
+                self.canvas.create_window(padding * 125, 270, window=btn, width=110, height=50)
 
             #back button to the menu
             self.back_to_menu = Button(self.root, text="Back to Menu", font=button_font, bg="lightgrey", command=self.back_to_menu)
