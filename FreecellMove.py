@@ -354,6 +354,7 @@ def move_foundation_to_freecell(state, suit):
 
 # Supermove Move Checker and Executor --------------------------------------------------------------------------------------------------------------------------------
 
+
 def can_supermove(state, src, dest):
     """
     Checks if a supermove can be performed from one tableau column to another.
