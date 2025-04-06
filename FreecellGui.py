@@ -9,7 +9,7 @@ from PIL import Image, ImageTk
 import FreecellMove as fcm
 from Card import Card
 from Move import Move
-from FreecellAI import solve_game_astar,solve_game_bfs, solve_game_dfs, grid_search
+from FreecellAI import solve_game_astar, solve_game_bfs, solve_game_dfs, grid_search
 from FreecellState import FreecellState
 import random
 
@@ -51,7 +51,7 @@ class FreeCellGUI:
         self.draw_board()
   
     def setup_buttons(self):
-        """Creates and places buttons that remain static."""
+        """Creates and places buttons."""
         self.save_button = Button(self.root, text="Save Game", command=self.save_game)
         self.solve_button = Button(self.root, text="Solve Game", command=self.solve_game)
         self.undo_button = Button(self.root, text="Undo",command=self.undo_move)
@@ -260,6 +260,10 @@ class FreeCellGUI:
             print(f"Error showing messagebox: {e}")
 
     def hint_move(self):
+        """
+        Provides a hint to the player by suggesting a random valid move based on the current game state.
+        Displays the hint in a message box or informs if no moves are available.
+        """
         #get possible free moves for the current state 
         possible_moves = FreecellState.get_possible_moves(self.game)
         if not possible_moves:
@@ -309,6 +313,10 @@ class FreeCellGUI:
         print("Game saved successfully!")
     
     def solve_game(self):
+        """
+        Displays options for solving the game using different algorithms (A*, BFS, DFS) 
+        and creates corresponding buttons on the GUI.
+        """
         self.title_id = self.canvas.create_text(450, 610, text="Choose an algorithm to solve the game", font=("Helvetica", 15), fill="white")
     
         self.solve_button_tester = Button(self.root, text="tester", command=self.solve_game_tester)
@@ -327,14 +335,25 @@ class FreeCellGUI:
             self.root.after(100, self.solve_game_tester_2)
 
     def solve_game_AI(self):
+        """
+        Initiates the AI-based solution process for the game, hiding the solver UI and scheduling the next step.
+        """
         if self.hide_solver_ui():
             self.root.after(100, self.solve_game_AI_2)
 
     def solve_game_bfs(self):
+        """
+        Initiates the process of solving the Freecell game using the BFS algorithm, 
+        starting by hiding the solver UI and scheduling the next step.
+        """
         if self.hide_solver_ui():
             self.root.after(100, self.solve_game_bfs_2)
 
     def solve_game_dfs(self):
+        """
+        Initiates the process to solve the game using a depth-first search (DFS) approach.
+        Hides the solver UI before scheduling the next step of the DFS algorithm.
+        """
         if self.hide_solver_ui():
             self.root.after(100, self.solve_game_dfs_2)
 
@@ -353,6 +372,10 @@ class FreeCellGUI:
         print("Best weight combination:", best_combo, "with cost:", best_cost)
 
     def solve_game_AI_2(self):
+        """
+        Solves the current Freecell game using the A* algorithm and visualizes the solution step-by-step.
+        If a solution is found, applies the moves and updates the game state; otherwise, notifies the user.
+        """
         result = solve_game_astar(self.game)
         if result is not None:
             print("Game solved by A Star!")
@@ -377,6 +400,10 @@ class FreeCellGUI:
             print("A Star could not solve the game.")
 
     def solve_game_bfs_2(self):
+        """
+        Solves the current Freecell game using a BFS algorithm and visualizes the solution step-by-step.
+        Applies moves to the game state, updates the GUI, and handles the winning state if solved.
+        """
         result = solve_game_bfs(self.game)
         if result is not None:
             print("Game solved by BFS!")
@@ -401,6 +428,9 @@ class FreeCellGUI:
             print("BFS could not solve the game.")
 
     def solve_game_dfs_2(self):
+        """
+        Solves the current Freecell game using a depth-first search (DFS) approach, animating the solution process step-by-step.
+        """
         result = solve_game_dfs(self.game)
         if result is not None:
             print("Game solved by DFS!")
@@ -425,7 +455,10 @@ class FreeCellGUI:
             print("DFS could not solve the game.")
     
     def hide_solver_ui(self):
-        """Attempts to remove solver UI buttons and returns True if successful."""
+        """
+        Hides the solver UI elements by removing buttons and canvas items. 
+        Returns True if successful, otherwise False if an error occurs.
+        """
         try:
             self.solve_button_tester.destroy()
             self.solve_button_AI.destroy()
@@ -443,10 +476,14 @@ class FreeCellGUI:
             print(f"Error while hiding solver UI: {e}")
             return False  # Something went wrong
         
-    def return_to_main_menu(self):
-        from FreecellMenu import FreecellMenu  # Avoid circular import at top level
 
-        for widget in self.root.winfo_children():
-            widget.destroy()
         
-        FreecellMenu.setup_menu(self)
+
+        
+        
+
+
+
+
+
+

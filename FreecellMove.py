@@ -5,7 +5,9 @@ from Move import Move
 
 
 def get_possible_moves_Astar(state):
-    """Get all possible moves from the state, avoiding back-and-forth moves."""
+    """
+    Generate a list of all possible valid moves from the current game state for the A* algorithm, avoiding reversals of previous moves.
+    """
     moves = []
     
     last_state = state.history[-1] if state.history else None  # Last state for comparison
@@ -51,7 +53,9 @@ def get_possible_moves_Astar(state):
     return moves
 
 def get_possible_moves(state, AImode=False):
-    """Get all possible moves from the state"""
+    """
+    Generate all valid moves from the current Freecell game state, optionally displaying them if not in AI mode.
+    """
     moves = []
     for i, column in enumerate(state.tableau):
         if column:
@@ -99,11 +103,8 @@ def get_possible_moves(state, AImode=False):
 
 def get_possible_supermoves(state):
     """
-    Get all possible supermoves from the current state.
-
-    Returns:
-    - A list of tuples (src, dest, num_cards) representing the source tableau column,
-        destination tableau column, and the number of cards that can be moved.
+    Determine all possible supermoves in the current game state, returning a list of valid supermoves between tableau columns.
+    Each supermove is represented as a tuple (source_column, destination_column, number_of_cards).
     """
     supermoves = []
 
@@ -122,6 +123,10 @@ def get_possible_supermoves(state):
 
 
 def get_automatic_moves(state):
+    """
+    Determine and return a list of automatic moves that can be made to the foundations 
+    from the tableau or free cells based on the current game state.
+    """
 
     moves = []
 
@@ -163,8 +168,10 @@ def get_automatic_moves(state):
     return moves
 
 def apply_automatic_moves(state):
-    """Recursively applies all automatic moves to foundations until no more can be made."""
-    
+    """
+    Executes all possible automatic moves on the given game state until no more moves can be made.
+    Returns the updated game state after applying all automatic moves.
+    """
     while True:
         moves = get_automatic_moves(state)
         if not moves:  # Stop when no more automatic moves are possible
@@ -357,17 +364,10 @@ def move_foundation_to_freecell(state, suit):
 
 def can_supermove(state, src, dest):
     """
-    Checks if a supermove can be performed from one tableau column to another.
-    Ensures the cards are together, have alternating colors, and are in decreasing rank.
-    Returns the number of cards that can be moved if the supermove is valid, otherwise returns 0.
-
-    Preconditions:
-    - The source tableau column `src` is not empty.
-    - The destination tableau column `dest` is valid for the move.
-
-    Returns:
-    - The number of cards that can be moved if the supermove is valid, otherwise 0.
+    Determines the number of cards that can be moved as a supermove from a source column to a destination column in a Freecell game state.
+    Returns the number of cards that can be moved if valid, otherwise returns 0.
     """
+
     if not state.tableau[src]:
         return 0  # Source column is empty
 
@@ -396,19 +396,9 @@ def can_supermove(state, src, dest):
 
 def execute_supermove(state, src, dest, num_cards):
     """
-    Executes a supermove by moving multiple cards from one tableau column to another.
-
-    Preconditions:
-    - The source tableau column `src` is not empty.
-    - The destination tableau column `dest` is valid for the move.
-    - The number of cards to move `num_cards` is within the allowed limit.
-
-    Effects:
-    - Moves multiple cards from the source tableau column to the destination tableau column.
-
-    Returns:
-    - A new state with the supermove applied, or None if the move is not possible.
+    Executes a supermove in the Freecell game, transferring a specified number of cards from a source column to a destination column if the move is valid.
     """
+
     if num_cards <= 0 or not state.tableau[src]:
         return None  # Invalid number of cards or empty source column
 

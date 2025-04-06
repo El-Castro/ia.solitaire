@@ -11,10 +11,11 @@ from FreecellState import FreecellState
 
 
 def solve_game_astar(game):
-    """This function attempts to solve the Freecell game using the A* search algorithm.
-    It initializes the open set with the initial game state and iteratively explores
-    the possible moves to find the solution. The heuristic function is used to estimate
-    the cost of reaching the goal from the current state."""
+    """Solve the Freecell game using the A* search algorithm.
+    The algorithm uses a priority queue (open set) to explore game states,
+    guided by a heuristic function that estimates the cost to reach the goal.
+    It iteratively evaluates possible moves until a solution is found or all
+    states are explored."""
     start_time = time.time()  # Start timer
     tracemalloc.start()  # Start memory tracking
     isDone=False
@@ -100,10 +101,11 @@ def solve_game_astar(game):
 
 def solve_game_bfs(game):
     """
-    Attempts to solve the Freecell game using breadth-first search (BFS).
-    It explores the state space level by level without using heuristics.
-    If a solution is found, it reconstructs and returns the path of moves.
-    Otherwise, returns None.
+    Solves the Freecell game using breadth-first search (BFS).
+    This algorithm explores the state space level by level, ensuring that the
+    shallowest solution is found first. It does not use heuristics to guide the search.
+    If a solution is found, it reconstructs and returns the sequence of moves.
+    If no solution exists, it returns None.
     """
     start_time = time.time()  # Start timer
     tracemalloc.start()  # Start memory tracking
@@ -182,10 +184,10 @@ def solve_game_bfs(game):
 
 def solve_game_dfs(game, max_depth=45):
     """
-    Attempts to solve the Freecell game using depth-first search (DFS) with a depth limit.
-    It explores moves until a solution is found or the depth limit is reached.
-    If a solution is found, it reconstructs and returns the path of moves.
-    Otherwise, returns None.
+    Solves the Freecell game using depth-first search (DFS) with a specified depth limit.
+    The algorithm explores possible moves in a depth-first manner, backtracking when necessary.
+    If a solution is found within the depth limit, it reconstructs and returns the sequence of moves.
+    If no solution is found it returns None.
     """
     max_depth_reached = 0
     start_time = time.time()
@@ -261,7 +263,9 @@ def solve_game_dfs(game, max_depth=45):
 
 
 def reconstruct_path_bfs(came_from, current):
-    # Reconstruct the path from the goal to the start
+    """
+    Reconstructs the path from the goal to the start using the BFS algorithm's `came_from` mapping.
+    """
     total_path = []
     while current in came_from:
         current, move = came_from[current]
@@ -279,7 +283,9 @@ def reconstruct_path_bfs(came_from, current):
     return total_path
 
 def reconstruct_path_astar(came_from, current):
-    # Reconstruct the path from the goal to the start
+    """
+    Reconstructs the path from the goal to the start using the A* algorithm's `came_from` mapping.
+    """
     total_path = []
     while current in came_from:
         current, move = came_from[current]
@@ -297,7 +303,9 @@ def reconstruct_path_astar(came_from, current):
     return total_path
 
 def reconstruct_path_dfs(came_from, current):
-    # Reconstruct the path from the goal to the start
+    """
+    Reconstructs the path from the goal to the start using the DFS algorithm's `came_from` mapping.
+    """
     total_path = []
     while current in came_from:
         current, move = came_from[current]

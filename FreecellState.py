@@ -150,15 +150,17 @@ class FreecellState:
         return fcm.get_possible_moves(self, AImode)
 
     def get_possible_moves_Astar(self):
-        """Calls get_possible_moves_AI from FreecellMove."""
+        """Calls get_possible_moves_Astar from FreecellMove."""
         return fcm.get_possible_moves_Astar(self)
 
 
 # Heuristic -----------------------------------------------------------------------------------------------------------------------------
 
-    """Calculates a heuristic value for the current FreecellState."""
 
     def heuristic(self):
+        """
+        Calculates a heuristic score for the current Freecell game state.
+        """
         w = HEURISTIC_WEIGHTS
         # foundation_weight = 0.5
         # fc_weight = 0.20
